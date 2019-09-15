@@ -1,0 +1,430 @@
+<template>
+<div class="container">
+    <div class="oglas">
+      
+      <div class="levo">
+        <h1 class="naslov">{{ oglas.naziv }} </h1>
+        <img class="slika" v-bind:src="`${oglas.slika}`" width="100%">
+      </div>
+
+    <div class="sredina">
+      <label class="naslovOpis">Opis:</label>
+      <label class="opis">{{ oglas.opis }}</label>
+      <label class="naslovGrad">Grad:</label>
+      <label class="grad">{{ oglas.grad }}</label>
+      <label class="naslovStanje">Stanje oglasa:</label>
+      <label class="stanje">{{ oglas.stanje }}</label>
+    </div>
+
+    <div class="desno">
+      <div class="red">
+      <img v-if="!dostavljen" class="like" src="../assets/like.svg">
+      <img v-if="this.$session.exists() && dostavljen" v-on:click="likeOglas" class="likeDugme" src="../assets/like.svg">
+      <label class="broj">{{ oglas.brLajkova }}</label>
+      <img v-if="!dostavljen" class="like" src="../assets/dislike.svg">
+      <img v-if="this.$session.exists() && dostavljen" v-on:click="dislikeOglas" class="dislikeDugme" src="../assets/dislike.svg">
+      <label class="dolebroj">{{ oglas.brDislajkova }}</label>
+
+
+      <img class="fav" v-on:click="favorite" v-if="this.$session.exists() && !omiljen && kupac"  src="../assets/heart.svg">
+      <img class="fav" v-on:click="removeFav" v-if="this.$session.exists() && omiljen && kupac"  src="../assets/redheart.svg">
+
+      </div>
+      <div class="datumi">
+        <label class="naslovD">Datum postavljanja: </label>
+        <label class="datum">{{ oglas.datumPostavljanja }}</label>
+                <label class="naslovD">Datum isticanja: </label>
+        <label class="datum">{{ oglas.datumIsticanja }}</label>
+        </div>
+        <button v-if="this.$session.exists() && !narucen && !dostavljen && kupac" class="dugme" v-on:click="order" >Poruči</button>
+        <button v-if="this.$session.exists() && narucen && !dostavljen && kupac" class="dugme2" v-on:click="delivered" >Dostavljeno</button>
+        <button v-if="this.$session.exists() && admin && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
+        <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
+    </div>
+    </div>
+    
+<div class="recenzije">
+  <h2 class="naslovRecenzije">Recenzije kupaca:</h2>
+
+</div>
+
+</div>
+</template>
+
+<script>
+
+
+export default {
+
+  data () {
+    return {
+      oglas: {}, 
+      omiljen: false,
+      narucen: false,
+      dostavljen: false,
+      obrisan: false,
+
+      kupac: false,
+      admin: false,
+      prodavac: false,
+
+
+
+        headers : {
+          'Content-Type' : 'application/json'
+        }
+      
+
+    }
+
+  },
+
+  methods: {
+    favorite : function(){
+      this.$http.post(`http://localhost:9090/WebProj/user/fav/${this.$route.params.id}`, this.$session.get('idOne'), {headers:this.headers}).then(() =>{
+        this.omiljen = true;
+      })
+    },
+
+    removeFav : function(){
+      this.$http.post(`http://localhost:9090/WebProj/user/fav-remove/${this.$route.params.id}`, this.$session.get('idOne'), {headers:this.headers}).then(() =>{
+        this.omiljen = false;
+      })
+    },
+
+    order : function(){
+      this.$http.post(`http://localhost:9090/WebProj/user/order/${this.$route.params.id}`, this.$session.get('idOne'), {headers:this.headers}).then(() =>{
+      this.narucen = true; 
+      this.$emit('changedView');   
+    })
+     },
+
+      delivered : function(){
+      this.$http.post(`http://localhost:9090/WebProj/user/delivered/${this.$route.params.id}`, this.$session.get('idOne'), {headers:this.headers}).then(() =>{
+      this.dostavljen = true; 
+      this.$emit('changedView'); 
+    })
+    
+    },
+      likeOglas : function(){
+      this.$http.post(`http://localhost:9090/WebProj/article/like/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+      this.$emit('changedView');
+      
+    
+    })
+
+      },
+
+      dislikeOglas : function(){
+      this.$http.post(`http://localhost:9090/WebProj/article/dislike/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+      this.$emit('changedView');
+    
+    })
+      },
+
+      deleteArticle : function(){
+        this.$http.post(`http://localhost:9090/WebProj/article/delete/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+          this.obrisan = true;
+          this.$emit('changedView');
+          
+        })
+      },
+
+      edit : function(){
+
+      }
+
+
+    },
+
+  
+
+
+
+  beforeCreate(){
+    this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
+        this.oglas = response.body;
+
+        if(this.oglas.stanje === "OBRISAN"){
+          this.obrisan = true;
+          this.omiljen = false;
+          this.narucen = false;
+          this.dostavljen = false;
+        }
+
+    })
+
+  },
+
+  created(){
+    if (this.$session.exists()) {
+      this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+        response.body.omiljeniOglasi.forEach(element => {
+          if(element === this.$route.params.id){
+            this.omiljen = true;
+
+          }
+        });
+
+        response.body.poruceniProizvodi.forEach(element => {
+          if(element === this.$route.params.id){
+            this.narucen = true;          
+
+          }                  
+
+        });
+
+        response.body.dostavljeniProizvodi.forEach(element => {
+          if(element === this.$route.params.id){
+            this.dostavljen = true;
+
+          }                  
+
+        });
+
+
+
+          if(response.body.uloga === "KUPAC"){
+            this.kupac = true;
+          } else if (response.body.uloga === "ADMINISTRATOR"){
+            this.admin = true;
+          } else if (response.body.uloga === "PRODAVAC"){
+            this.prodavac = true;
+          }
+
+        })
+
+
+    }
+  }
+}
+
+
+</script>
+
+<style scoped>
+
+.container{
+  padding: 80px 20px 10px 20px;
+}
+
+.oglas{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: left;
+}
+
+.levo, .sredina, .desno{
+  width: 30%;
+  height: auto;
+  /*border: 1px solid black; */
+}
+
+.sredina{
+  border-left: 1px solid #7e747e;
+  border-right: 1px solid #7e747e;
+}
+
+.levo{
+  display: flex;
+  flex-direction: column;
+  align-content: left;
+  margin: 15px;
+
+}
+
+.naslov, .naslovRecenzije{
+    color: #7e747e;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    text-align: left;
+    padding: 0px 10px 30px 10px;
+
+}
+
+.slika{
+    object-fit: contain;
+    max-width: 330px;
+    height: auto;
+    padding: 10px;
+    
+}
+
+.sredina{
+    display: flex;
+  flex-direction: column;
+  align-content: left;
+  margin: 15px 15px 15px 0px;
+  padding: 30px 20px 10px 20px;
+
+}
+
+.naslovOpis{
+    color: #292629;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 20px;
+}
+
+.opis{
+    color: #3b3b3b;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 15px;  
+    padding: 6px 0 20px 0;
+   /* border-bottom: 1px solid #7e747e; */
+}
+
+.naslovGrad, .naslovStanje{
+    color: #292629;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    padding-top: 20px;
+}
+
+.grad{
+    color: #3b3b3b;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 15px;  
+    padding: 6px 0 20px 0;
+   /* border-bottom: 1px solid #7e747e; */
+}
+
+.stanje{
+    color: #3b3b3b;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 15px;  
+    padding: 6px 0 20px 0;
+}
+
+.desno{
+    display: flex;
+  flex-direction: column;
+  align-content: left;
+  margin: 15px 15px 15px 0px;
+  padding: 30px 10px 10px 10px;
+
+}
+
+.red{
+      display: flex;
+  flex-direction: row;
+  align-content: left;
+}
+
+.like{
+  width: 30px;
+  height: auto;
+  
+}
+
+.likeDugme, .dislikeDugme{
+
+  width: 30px;
+  height: auto;
+  cursor: pointer;
+  
+
+}
+
+.broj{
+    color: #3b3b3b;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    margin: 8px 13px 0 2px;
+}
+
+.dolebroj{
+    color: #3b3b3b;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    margin: 8px 0px 0px 4px;
+}
+
+.fav{
+  width: 30px;
+  height: auto;
+  float: right;
+  margin-left: 180px;
+  cursor: pointer;
+}
+
+.datumi{
+  display: flex;
+  flex-direction: column;
+  margin-top: 140px;
+
+}
+
+.naslovD{
+      color: #3b3b3b;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;  
+    padding-top: 7px;
+
+}
+
+.datum{
+      color: #3b3b3b;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px;  
+      /*  border-bottom: 1px solid #7e747e;*/
+        padding: 2px 0 12px 2px;
+}
+
+.dugme{
+    background-color: #696469;
+    color:#e9e0e9;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    border: none;
+    width: 170px;
+    height: 37px;
+    margin: 50px 0 0 90px;
+    cursor:pointer;
+    box-shadow: 0px 7px 10px rgba(0, 0, 0, 0.1);
+
+
+}
+
+.dugme2{
+    background-color: #e9e0e9;
+    color:#696469;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    border: none;
+    width: 170px;
+    height: 37px;
+    margin: 50px 0 0 90px;
+    cursor:pointer;
+    box-shadow: 0px 7px 10px rgba(0, 0, 0, 0.1);
+
+
+}
+
+
+.dugmeObrisi{
+    background-color: #696469;
+    color:#e9e0e9;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    border: none;
+    width: 170px;
+    height: 37px;
+    margin: 10px 0 0 90px;
+    cursor:pointer;
+    box-shadow: 0px 7px 10px rgba(0, 0, 0, 0.1);
+
+
+}
+
+.dugme:hover{
+      background-color: #3b393b;
+}
+
+.recenzije{
+  margin-top: 90px;
+  /* border: 1px solid black; */
+  width: 300;
+  height: auto;
+}
+
+</style>
