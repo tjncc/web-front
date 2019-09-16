@@ -89,6 +89,7 @@ export default {
 img{
   width: auto;
   max-height: 165px;
+  max-width: 215px;
   align-self: center;
   margin: auto;
   object-fit: contain;
