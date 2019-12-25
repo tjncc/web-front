@@ -35,11 +35,15 @@
         <label class="datum">{{ oglas.datumPostavljanja }}</label>
                 <label class="naslovD">Datum isticanja: </label>
         <label class="datum">{{ oglas.datumIsticanja }}</label>
+        <label class="autor">Autor oglasa: </label>
+        <label class="autorIme" v-on:click="prodavacPregled">{{ oglas.prodavac }}</label>
         </div>
         <button v-if="this.$session.exists() && !narucen && !dostavljen && kupac" class="dugme" v-on:click="order" >Poruči</button>
         <button v-if="this.$session.exists() && narucen && !dostavljen && kupac" class="dugme2" v-on:click="delivered" >Dostavljeno</button>
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
+        <button v-if="this.$session.exists() && autor && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
+        <button v-if="this.$session.exists() && autor && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
     </div>
     </div>
     
@@ -58,7 +62,8 @@ export default {
 
   data () {
     return {
-      oglas: {}, 
+      oglas: {},
+
       omiljen: false,
       narucen: false,
       dostavljen: false,
@@ -67,6 +72,7 @@ export default {
       kupac: false,
       admin: false,
       prodavac: false,
+      autor: false,
 
 
 
@@ -123,7 +129,7 @@ export default {
       },
 
       deleteArticle : function(){
-        this.$http.post(`http://localhost:9090/WebProj/article/delete/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+        this.$http.post(`http://localhost:9090/WebProj/article/delete/${this.$route.params.id}`, this.$session.get('idOne'),{headers:this.headers}).then(() =>{
           this.obrisan = true;
           this.$emit('changedView');
           
@@ -131,7 +137,11 @@ export default {
       },
 
       edit : function(){
+          this.$router.push({name:'edit', params:{id:this.oglas.naziv}})
+      },
 
+      prodavacPregled : function(){
+        this.$router.push({name:'sellerName', params:{id:this.oglas.prodavac}});
       }
 
 
@@ -151,14 +161,9 @@ export default {
           this.narucen = false;
           this.dostavljen = false;
         }
-
-    })
-
-  },
-
-  created(){
-    if (this.$session.exists()) {
+        if (this.$session.exists()) {
       this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+
         response.body.omiljeniOglasi.forEach(element => {
           if(element === this.$route.params.id){
             this.omiljen = true;
@@ -182,21 +187,27 @@ export default {
 
         });
 
-
-
           if(response.body.uloga === "KUPAC"){
             this.kupac = true;
           } else if (response.body.uloga === "ADMINISTRATOR"){
             this.admin = true;
           } else if (response.body.uloga === "PRODAVAC"){
             this.prodavac = true;
+            if((response.body.korisnickoIme === this.oglas.prodavac) && (this.oglas.stanje === "AKTUELAN")){
+              this.autor = true;
+              
           }
+          }
+
 
         })
 
 
     }
-  }
+    })
+
+  },
+
 }
 
 
@@ -245,8 +256,11 @@ export default {
 .slika{
     object-fit: contain;
     max-width: 330px;
-    height: auto;
+    max-height: 330px;
+    width: auto;
     padding: 10px;
+    align-self: center;
+
     
 }
 
@@ -273,7 +287,7 @@ export default {
    /* border-bottom: 1px solid #7e747e; */
 }
 
-.naslovGrad, .naslovStanje{
+.naslovGrad, .naslovStanje, .autor{
     color: #292629;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     font-size: 20px;
@@ -350,7 +364,7 @@ export default {
 .datumi{
   display: flex;
   flex-direction: column;
-  margin-top: 140px;
+  margin-top: 30px;
 
 }
 
@@ -368,6 +382,20 @@ export default {
     font-size: 15px;  
       /*  border-bottom: 1px solid #7e747e;*/
         padding: 2px 0 12px 2px;
+}
+
+
+
+.autorIme{
+      color: #3b3b3b;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px; 
+    cursor: pointer;
+    margin-top: 2px; 
+}
+
+.autorIme:hover{
+  color: #757575;
 }
 
 .dugme{

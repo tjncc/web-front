@@ -10,6 +10,7 @@ import ArticleListAdmin from './components/ArticleListAdmin'
 import AllArticles from './components/AllArticles'
 import SellerProfile from './components/SellerProfile'
 import AddArticle from './components/AddArticle'
+import SellerView from './components/SellerView'
 
 export default[
     { path:'/', components: {default: HomePage, header: SearchBar, side: SideBar }},
@@ -21,5 +22,7 @@ export default[
     { path: '/article-list', component: ArticleListAdmin },
     { path: '/all-articles', components: {default: AllArticles, header: SearchBar, side: SideBar} },
     { path: '/seller-profile', component: SellerProfile },
-    { path: '/add-article', component: AddArticle }
+    { path: '/add-article', component: AddArticle },
+    { path: '/edit-article/:id', name: 'edit', component: AddArticle },
+    { path: '/seller-view/:id', name: 'sellerName', component: SellerView },
 ]

@@ -10,7 +10,7 @@
         <h4 class="cenaOglasa">{{ oglas.cena }}€</h4>
       </div>
       <div class="slika">
-      <img v-bind:src="`${oglas.slika}`" v-on:click="otvori(oglas.naziv)">
+      <img class="imgOglasa" v-bind:src="`${oglas.slika}`" v-on:click="otvori(oglas.naziv)">
       </div>
 
     </div>
@@ -86,16 +86,16 @@ export default {
   
 }
 
-img{
+
+
+.imgOglasa{
   width: auto;
   max-height: 165px;
   max-width: 215px;
   align-self: center;
-  margin: auto;
+  margin: 4px;
   object-fit: contain;
-  
-  
-  
+
 }
 
 .gore{

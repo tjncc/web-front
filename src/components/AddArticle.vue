@@ -9,13 +9,13 @@
             <div class="image-preview" >
                 <img class="preview" v-if="oglas.slika.length > 0" :src="oglas.slika">
             </div>
-            <input type="file" @change="onFileSelected" accept="image/*" class="photoInput" required>
+            <input type="file" @change="onFileSelected" accept="image/*" class="photoInput" :required="!izmena" >
          <!--  <button v-on:click="$refs.photoInput.click()" class="dugmeSlika">Izaberite sliku</button> -->
           </div>
 
           <div class="sredina">
             <legend class="podaciLegend">Unesite podatke oglasa:</legend>
-            <input type="text" class="input-naziv" placeholder="Naziv" v-model="oglas.naziv" required>
+            <input type="text" class="input-naziv" placeholder="Naziv" v-model="oglas.naziv" required :readonly="izmena">
             <textarea  class="input-opis" placeholder="Opis" v-model="oglas.opis"></textarea>
             <input type="text" class="input-grad" placeholder="Grad" v-model="oglas.grad">
           </div>
@@ -59,7 +59,7 @@ export default {
         grad: "",
         prodavac: ""
       },
-      //selectedFile: null,
+      izmena: false,
 
     }
   },
@@ -82,14 +82,21 @@ export default {
         },
 
         addArticle : function(){
-          this.$http.post('http://localhost:9090/WebProj/addarticle', this.oglas ,{headers:this.headers}).then(() => {
-          alert('Oglas je dodat!');
-          this.$router.push('/seller-profile');
-        }, (response) => {
-          if(response.status == 400){
-            alert('Oglas sa ovim imenom vec postoji!');
-          }
-        })
+          if(!this.izmena){
+            this.$http.post('http://localhost:9090/WebProj/addarticle', this.oglas ,{headers:this.headers}).then(() => {
+           alert('Oglas je dodat!');
+           this.$router.push('/seller-profile');
+          }, (response) => {
+            if(response.status == 400){
+              alert('Oglas sa ovim imenom vec postoji!');
+           }
+          })
+        } else {
+          this.$http.post('http://localhost:9090/WebProj/article/edit', this.oglas ,{headers:this.headers}).then(() => {
+            alert('Oglas je izmenjen!');
+            this.$router.push(`/articleinfo/${this.$route.params.id}`);
+            })
+        }
         },
 
         
@@ -109,6 +116,16 @@ export default {
         this.oglas.prodavac = response.body.korisnickoIme;
       
       })
+
+      if(this.$route.name === "edit"){
+        this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
+          this.oglas = response.body;
+          this.izmena = true;
+          console.log(this.izmena);
+
+      })
+      
+    }
     }
 
 
@@ -140,12 +157,10 @@ export default {
 .ime{
   font-size: 25px;
   margin-left: 2px;
-  cursor: pointer;
+
 }
 
-.ime:hover{
-  color:#979497;
-}
+
 
 .slikaLegend{
     padding: 16px 0px 15px 7px;

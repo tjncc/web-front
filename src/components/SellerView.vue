@@ -14,22 +14,17 @@
         </div>
       </div>
       
-    <div class="dodajNovi">
-          <label class="tekstNovi">Dodaj novi oglas</label>
-          <button class="dugmeDodaj" v-on:click="dodajOglas"><img class="dodajSlika" src="../assets/add.svg"></button>
+    <div v-if="this.$session.exists() && kupac && !prijavljenProdavac" class="dodajNovi">
+          <button class="dugmeDodaj"  v-on:click="prijavi">Prijavi prodavca</button>
       </div>
+
       </div>
 
     <div class="sredina">
-        <h2 class="oglasiNaslov">Moji oglasi</h2>
-        <label class="stanjeOglasa">Stanje oglasa:</label>
-        <select class="combo" @change="selectChange()">
-            <option>Aktivan</option>
-            <option >U realizaciji</option>
-            <option>Dostavljen</option>
-        </select>
+        <h2 class="oglasiNaslov">Oglasi</h2>
+
     <div class="svioglasi">
-      <div class="oglas" v-for="oglas in oglasiPrikaz" v-bind:key="oglas.naziv">
+      <div class="oglas" v-for="oglas in aktivniOglasi" v-bind:key="oglas.naziv">
      
       <div class="gore" v-on:click="otvori(oglas.naziv)">
         <h3 class="nazivOglasa"> {{ oglas.naziv }}</h3>
@@ -43,9 +38,6 @@
     </div>
     </div>
  
-    <div class="desno">
-        <h2 class="recenzijeNaslov">Recenzije</h2>
-    </div>
       
 
   </div>
@@ -62,44 +54,55 @@ export default {
             korisnickoIme: "",
             uloga: "",
             brLajkova: 0,
-            brDislajkova: 0
+            brDislajkova: 0,
         },
         izabranoStanje: "Aktivan",
         aktivniOglasi: [],
-        realizacijaOglasi: [],
-        dostavljeniOglasi: [],
-        oglasiPrikaz: [],
+        prijavljenProdavac: false,
+
+        kupac: false,
+        admin: false,
+        prodavac: false,
+
     }
   },
 
     methods : {
-        dodajOglas : function() {
-            this.$router.push('/add-article');
-        },
+
 
         otvori(naziv) {
             this.$router.push({name:'name', params:{id:naziv}})
         },
 
-        selectChange(){
-            console.log(event);
-            switch(event.target.value) {
-
-            case "Aktivan":
-                this.oglasiPrikaz = this.aktivniOglasi;
-            break;
-            case "U realizaciji":
-                    this.oglasiPrikaz = this.realizacijaOglasi;
-            break;
-            case "Dostavljen": 
-                    this.oglasiPrikaz = this.dostavljeniOglasi;
-            }
+        prijavi() {
+            if(this.prijavljenProdavac === false){
+                this.$http.post(`http://localhost:9090/WebProj/userreport/${this.$route.params.id}`,{headers:this.headers}).then((response) => {
+                    this.prijavljenProdavac = true;
+            }) 
         }
+        },
+
+
         
     },
 
+    beforeCreate(){
+        if (this.$session.exists()) {
+            this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+            if(response.body.uloga === "KUPAC"){
+            this.kupac = true;
+          } else if (response.body.uloga === "ADMINISTRATOR"){
+            this.admin = true;
+          } else if (response.body.uloga === "PRODAVAC"){
+            this.prodavac = true;        
+          }
+            })
+
+        }
+    },
+
     created(){
-        this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+        this.$http.post(`http://localhost:9090/WebProj/sellerinfo/${this.$route.params.id}` ,{headers:this.headers}).then((response) => {
           this.sellerInfo.korisnickoIme = response.body.korisnickoIme;
           this.sellerInfo.uloga = response.body.uloga;
 
@@ -154,7 +157,7 @@ export default {
     flex-wrap: wrap;
 }
 
-.sredina, .desno{
+.sredina{
     width: 29%;
     height: auto;
     margin: 80px 0 10px 30px;
@@ -261,14 +264,18 @@ export default {
     background: #89848b;
     border: none;
     outline: none;
-    padding-top: 10px;
+    padding: 5px;
     cursor: pointer;
+     font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    color: #eeeeee;
+ 
 }
 
-.dodajSlika{
-    width: 26%;
-    height: auto;
+.dugmeDodaj:hover{
+    color: #cacaca;
 }
+
 
 .oglasiNaslov, .recenzijeNaslov{
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -281,18 +288,7 @@ export default {
     font-size: 17px;
 }
 
-.combo{
-    width: 36%;
-    height: auto;
-    padding: 3px;
-    outline: none;
-    border: 1px solid #dbdbdb;
-    background: #ebebeb;
-        font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    color: #555057;
-    font-size: 14px;
-    margin: 1% 0 0 32%;
-}
+
 
 .svioglasi{
     display: flex;
