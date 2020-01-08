@@ -1,12 +1,18 @@
 <template>
-    <div class="sidebar">
+    <div>
+        <div class="btndiv" v-if="this.$session.exists() && admin">
+        <button class="katbtn" v-if="this.$session.exists() && admin" v-on:click="dodajKateg">Dodaj kategoriju</button>
+        </div>
+        <div class="sidebar">
         <div class="sideHeader">
+            
             <h3>Kategorije:</h3>
         </div>
         <div class="sideContent">
         <ul>
             <li v-for="kat in kategorije" v-bind:key="kat.naziv" >{{ kat.naziv }}</li>
         </ul>
+        </div>
         </div>
     </div>
 
@@ -18,8 +24,34 @@ export default {
 
   data () {
       return {
-          kategorije: {}
+          kategorije: {},
+
+        kupac: false,
+        admin: false,
+        prodavac: false,
           
+      }
+  },
+
+  methods : {
+        dodajKateg : function() {
+            this.$router.push('/add-category');
+        },
+  },
+
+  beforeCreate(){
+      if (this.$session.exists()) {
+      this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+          if(response.body.uloga === "KUPAC"){
+            this.kupac = true;
+          } else if (response.body.uloga === "ADMINISTRATOR"){
+            this.admin = true;
+          } else if (response.body.uloga === "PRODAVAC"){
+            this.prodavac = true;
+          }
+
+
+        })
       }
   },
 
@@ -41,7 +73,7 @@ export default {
     width: 160px;
     position: fixed; 
     margin: 80px 0 0 10px;
-    background-color: #ece9e2;
+    background-color: #e7e2ec;
     padding: 0px 20px;
     max-height: 550px;
 
@@ -53,7 +85,7 @@ export default {
     text-decoration: none;
     color: #4c464e;
     position: fixed;
-    background: #ece9e2;
+    background: #e7e2ec;
 }
 
 .sideContent{
@@ -83,6 +115,29 @@ li{
 li:hover {
     color: #b6b3b3;
     cursor: pointer;
+}
+
+.katbtn{
+    
+    padding: 8px;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    color: #5e5561;
+    font-size: 17px;
+    background: #d9d3df;
+     border: none;
+     cursor:pointer;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    outline: none;
+
+}
+
+.katbtn:hover{
+    background: #423d42;
+    color: #c4bdc4;
+}
+
+.btndiv{
+    margin: 90px 0 -58px 37px;
 }
 
 </style>

@@ -131,7 +131,7 @@ export default {
 
         this.$http.post(`http://localhost:9090/WebProj/user/view-article/omiljeni`, this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           response.body.forEach(element => {
-            if(element.stanje === "AKTIVAN"){
+            if(element.stanje === "AKTUELAN"){
               this.buyerInfo.omiljeniOglasi = response.body;
             }
           });

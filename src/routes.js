@@ -11,6 +11,7 @@ import AllArticles from './components/AllArticles'
 import SellerProfile from './components/SellerProfile'
 import AddArticle from './components/AddArticle'
 import SellerView from './components/SellerView'
+import AddCategory from './components/AddCategory'
 
 export default[
     { path:'/', components: {default: HomePage, header: SearchBar, side: SideBar }},
@@ -25,4 +26,5 @@ export default[
     { path: '/add-article', component: AddArticle },
     { path: '/edit-article/:id', name: 'edit', component: AddArticle },
     { path: '/seller-view/:id', name: 'sellerName', component: SellerView },
+    { path: '/add-category', component: AddCategory },
 ]

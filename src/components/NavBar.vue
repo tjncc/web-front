@@ -87,7 +87,7 @@ header{
     position: fixed; 
     top: 0; 
     width: 100%; 
-    background-color: #89848b;
+    background-color: #7b7286;
     padding: 0;
     margin: 0; 
 
