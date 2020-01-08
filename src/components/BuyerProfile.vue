@@ -196,11 +196,12 @@ export default {
     width: 16%;
     height: 80%;
     margin: 20px 60px 20px 20px;
-  background-color: beige;
+  background-color: rgb(241, 237, 229);
   align-content: center;
   padding: 0 10px 14px 10px;
     display: flex;
   flex-direction: column;
+  box-shadow: 3px 4px rgb(231, 231, 231);
 
 
     
@@ -251,7 +252,7 @@ label{
   width: 250px;
   height: 250px;
   margin: 20px 0px 20px 55px;
-  border: 3px solid rgb(214, 214, 207);
+  border: 3px solid #d0cad6;
   cursor: pointer;
   
 }
@@ -259,7 +260,7 @@ label{
 
 
 .gore{
-  background-color: rgb(214, 214, 207);
+  background-color: #d0cad6;
   max-height: 40px;
 }
 

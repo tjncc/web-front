@@ -147,7 +147,7 @@ export default {
   height: 250px;
   width: 250px;
   margin: 30px 0px 20px 80px;
-  border: 3px solid rgb(214, 214, 207);
+  border: 3px solid #d0cad6;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -158,7 +158,7 @@ export default {
 
 
 .gore{
-  background-color: rgb(214, 214, 207);
+  background-color: #d0cad6;
   max-height: 40px;
 }
 

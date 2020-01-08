@@ -10,7 +10,7 @@
         </div>
         <div class="sideContent">
         <ul>
-            <li v-for="kat in kategorije" v-bind:key="kat.naziv" >{{ kat.naziv }}</li>
+            <li v-for="kat in kategorije" v-bind:key="kat.naziv" v-on:click="otvori(kat.naziv)">{{ kat.naziv }}</li>
         </ul>
         </div>
         </div>
@@ -37,6 +37,10 @@ export default {
         dodajKateg : function() {
             this.$router.push('/add-category');
         },
+        otvori(naziv){
+            this.$router.push({name:'categoryName', params:{id:naziv}})
+            this.$router.go()
+    }
   },
 
   beforeCreate(){

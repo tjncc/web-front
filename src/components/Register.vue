@@ -110,7 +110,7 @@ a:hover{
 .containter{
 
     padding: 30px;
-    background-color: #ece9e2;
+    background-color: #e7e2ec;
     position: absolute;
     top: 50%;
     left: 50%;

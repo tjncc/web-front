@@ -150,7 +150,7 @@ h1{
     color: #423d42;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     font-size: 17px;
-    background: #c4bdc4;
+    background: #c8c1cf;
      border: none;
     padding: 5px;
     margin: 3%;

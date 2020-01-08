@@ -241,7 +241,7 @@ export default {
 .dodajNovi{
     width: 50%;
     height: auto;
-    background: #89848b;
+    background: #655b6e;
     margin-top: 80px;
     margin-left: 22.5%;
     display: flex;
@@ -258,7 +258,7 @@ export default {
 }
 
 .dugmeDodaj{
-    background: #89848b;
+    background: #655b6e;
     border: none;
     outline: none;
     padding-top: 10px;
@@ -305,7 +305,7 @@ export default {
   width: 215px;
   height: 215px;
   margin-top: 5%;
-  border: 3px solid #dddddd;
+  border: 3px solid #d0cad6;
   cursor: pointer;
   align-self: center;
   
@@ -323,7 +323,7 @@ export default {
 }
 
 .gore{
-  background-color: #dddddd;
+  background-color: #d0cad6;
   max-height: 40px;
 }
 

@@ -399,7 +399,7 @@ export default {
 }
 
 .dugme{
-    background-color: #696469;
+    background-color: #6c6377;
     color:#e9e0e9;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     font-size: 18px;  
@@ -430,7 +430,7 @@ export default {
 
 
 .dugmeObrisi{
-    background-color: #696469;
+    background-color: #7b7286;
     color:#e9e0e9;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     font-size: 18px;  
@@ -446,6 +446,10 @@ export default {
 
 .dugme:hover{
       background-color: #3b393b;
+}
+
+.dugme2:hover{
+    background-color: #d8cfe2;
 }
 
 .recenzije{

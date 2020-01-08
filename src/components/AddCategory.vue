@@ -5,17 +5,15 @@
           
           <div class="novakat">
               <legend>Naziv:</legend>
-            <input type="text" v-model="kategorija.naziv" class="input-ime" required>
+            <input type="text" v-model="kategorija.naziv" class="input-ime" required :readonly="izmena">
             <div>
                 <legend>Opis:</legend>
-            <!-- <input type="text" class="input-opis" rows="3" placeholder="Opis" required> -->
             <textarea
                 id="textarea"
                 type="text" class="input-opis"
                 v-model="kategorija.opis"
                 rows="7"
                 max-rows="8"
-                required
     ></textarea>
             </div>
           </div>
@@ -43,6 +41,7 @@ export default {
         kupac: false,
         admin: false,
         prodavac: false,
+        izmena: false,
 
       headers : {
         'Content-Type' : 'application/json'
@@ -54,6 +53,7 @@ export default {
   methods : {
 
       dodajNovu : function() {
+        if(!this.izmena){
         this.$http.post('http://localhost:9090/WebProj/addcategory', this.kategorija ,{headers:this.headers}).then(() => {
            alert('Kategorija je dodata!');
            this.$router.push('/admin-profile');
@@ -62,6 +62,12 @@ export default {
               alert('Kategorija sa ovim imenom vec postoji!');
            }
           })
+        } else {
+          this.$http.post('http://localhost:9090/WebProj/category/edit', this.kategorija ,{headers:this.headers}).then(() => {
+            alert('Kategorija je izmenjena!');
+            this.$router.push(`/category/${this.$route.params.id}`);
+            })
+        }
       },
 
         cancelInfo : function() {
@@ -91,6 +97,17 @@ export default {
 
         })
       }
+  },
+
+  created(){
+    if(this.$route.name === "editCat"){
+        this.$http.get(`http://localhost:9090/WebProj/categoryinfo/${this.$route.params.id}`).then(response =>{
+          this.kategorija = response.body;
+          this.izmena = true;
+         // console.log(this.izmena);
+
+      })
+    }
   }
 
 }

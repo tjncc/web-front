@@ -301,7 +301,7 @@ export default {
   width: 215px;
   height: 215px;
   margin-top: 5%;
-  border: 3px solid #dddddd;
+  border: 3px solid #d0cad6;
   cursor: pointer;
   align-self: center;
   
@@ -319,7 +319,7 @@ export default {
 }
 
 .gore{
-  background-color: #dddddd;
+  background-color: #d0cad6;
   max-height: 40px;
 }
 

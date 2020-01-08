@@ -138,7 +138,7 @@ export default {
 .containter{
 
     padding: 20px 20px;
-    background-color: #ece9e2;
+    background-color: #e7e2ec;
     position: absolute;
     top: 50%;
     left: 50%;

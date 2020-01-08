@@ -123,7 +123,7 @@ img{
   display: none;
   flex-direction: column;
   right: 0px;
-  background-color: #89848b;
+  background-color: #7b7286;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   position: absolute;
   z-index: 2;
