@@ -44,8 +44,22 @@
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
         <button v-if="this.$session.exists() && autor && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
         <button v-if="this.$session.exists() && autor && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
+        <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="show" >Dodaj kategoriju</button>
     </div>
     </div>
+
+    <modal name="categ" class="modalKat"
+         :height="500"
+         :width="270"
+         @before-open="beforeOpen">
+      <h2 class="naslovModal">Izaberite kategoriju: </h2>
+       <div class="sideContent">
+        <ul>
+            <li v-for="kat in kategorije" v-bind:key="kat.naziv" v-on:click="dodaj(kat.naziv)">{{ kat.naziv }}</li>
+        </ul>
+        </div>
+      
+    </modal>
     
 <div class="recenzije">
   <h2 class="naslovRecenzije">Recenzije kupaca:</h2>
@@ -74,10 +88,20 @@ export default {
       prodavac: false,
       autor: false,
 
+      kategorije: {},
+      oglasModal: {},
+      //kategorijeModal: {},
+
 
 
         headers : {
           'Content-Type' : 'application/json'
+          
+        },
+
+        textHeaders : {
+          'Content-Type' : 'text/plain'
+          
         }
       
 
@@ -142,6 +166,31 @@ export default {
 
       prodavacPregled : function(){
         this.$router.push({name:'sellerName', params:{id:this.oglas.prodavac}});
+      },
+
+      beforeOpen (event) {
+        console.log(event.params.foo);
+        this.oglasModal = event.params.foo.naziv;
+ 
+      },
+
+      show() {
+        this.$modal.show('categ', { foo: this.oglas })
+      },
+       hide () {
+        this.$modal.hide('categ');
+      },
+
+      dodaj(naziv){
+        this.$http.post(`http://localhost:9090/WebProj/article/category/${naziv}`, this.oglasModal, {textHeaders:this.textHeaders}).then(response =>{
+          console.log(this.oglasModal)
+          alert('Oglas je uspesno dodat u kategoriju!')
+          this.hide()
+        }, (response) => {
+            if(response.status == 400){
+              alert('Oglas se vec nalazi u ovoj kategoriji!');
+           }
+          })
       }
 
 
@@ -207,6 +256,14 @@ export default {
     })
 
   },
+
+  created(){
+      this.$http.get('http://localhost:9090/WebProj/categoryinfo').then(response => {
+          
+          this.kategorije = response.body;
+          
+      }) 
+  }
 
 }
 
@@ -444,12 +501,42 @@ export default {
 
 }
 
-.dugme:hover{
+.dugme:hover, .dugmeObrisi:hover{
       background-color: #3b393b;
 }
 
 .dugme2:hover{
     background-color: #d8cfe2;
+}
+
+.sideContent{
+    overflow-y: auto;
+    max-height: 430px;
+}
+
+ul{
+    padding: 10px 0 0 8px;
+    
+}
+
+li{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    color: #4c464e;
+    list-style: none;
+    padding: 7px;
+    width: 200px;
+    
+}
+
+.naslovModal{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    color: #4c464e;
+    margin: 10px;
+}
+
+li:hover {
+    color: #b6b3b3;
+    cursor: pointer;
 }
 
 .recenzije{
@@ -458,5 +545,7 @@ export default {
   width: 300;
   height: auto;
 }
+
+
 
 </style>
