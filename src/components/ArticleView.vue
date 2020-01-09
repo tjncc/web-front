@@ -14,6 +14,11 @@
       <label class="grad">{{ oglas.grad }}</label>
       <label class="naslovStanje">Stanje oglasa:</label>
       <label class="stanje">{{ oglas.stanje }}</label>
+      <label class="naslovStanje">Kategorije:</label>
+      <ul class="stanje">
+        <li v-for="kat in oglas.kategorije" v-bind:key="kat" v-on:click="otvori(kat)" class="viewCateg">{{kat}}</li>
+      </ul>
+
     </div>
 
     <div class="desno">
@@ -191,7 +196,12 @@ export default {
               alert('Oglas se vec nalazi u ovoj kategoriji!');
            }
           })
-      }
+      },
+
+          otvori(naziv){
+            this.$router.push({name:'categoryName', params:{id:naziv}})
+            //this.$router.go()
+    }
 
 
     },
@@ -544,6 +554,24 @@ li:hover {
   /* border: 1px solid black; */
   width: 300;
   height: auto;
+}
+
+.viewCateg{
+      font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    color: #4c464e;
+    display: inline;
+    text-overflow: clip;
+    padding: 5px;
+    margin: 3px;
+    background-color: #f1edf5;
+    width: auto;
+
+}
+
+.stanje{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 

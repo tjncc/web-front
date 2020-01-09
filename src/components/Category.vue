@@ -1,7 +1,7 @@
 <template>
     <div class="kategorijaContainter">
-        <button v-if="this.$session.exists() && admin"  v-on:click="obrisiKategoriju" class="btnBrisi">Obrisi</button>
-        <button v-if="this.$session.exists() && admin"  v-on:click="izmeniKategoriju" class="btnBrisi">Izmeni</button>
+        <button v-if="this.$session.exists() && admin" title="Obrisi kategoriju"  v-on:click="obrisiKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/bin.svg"></button>
+        <button v-if="this.$session.exists() && admin" title="Izmeni kategoriju"  v-on:click="izmeniKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/edit.svg"></button>
         <h1>{{kategorija.naziv}}</h1>
         <p class="opisKat">{{kategorija.opis}}</p>
        <!-- <button v-if="this.$session.exists() && admin"  v-on:click="dodajOglase" class="btnDodajOglase">Dodaj oglase</button> -->
@@ -9,14 +9,16 @@
         <div class="oglasiKategorije">
           
           <div class="omiljeniPrikaz" v-for="oglas in oglasi" v-bind:key="oglas.naziv" >
-            <div class="gore" v-on:click="otvori(oglas.naziv)">
+           
+         <!--    <button class="ukloniBtn">Ukloni oglas</button>-->
+            <div class="gore">
               <h3 class="nazivOglasa"> {{ oglas.naziv }}</h3>
-               <h4 class="cenaOglasa">{{ oglas.cena }}€</h4>
+               <h4 v-if="!admin" class="cenaOglasa">{{ oglas.cena }}€</h4>
+                <button v-if="admin" title="Ukloni oglas" class="ukloniBtn"  v-on:click="ukloni(oglas.naziv)"><img class="ukloniSlika" src="../assets/quit.svg"></button>
             </div>
             <div >
               <img class="slika" v-bind:src="`${oglas.slika}`" v-on:click="otvori(oglas.naziv)">
             </div>
-
         </div>
 
     </div>
@@ -72,7 +74,12 @@ export default {
       
       otvori(naziv){
         this.$router.push({name:'name', params:{id:naziv}})
-    }
+    },
+      ukloni(naziv){
+        this.$http.post(`http://localhost:9090/WebProj/category/deletearticle/${naziv}`, this.kategorija, {headers:this.headers}).then(response =>{
+          this.$router.go();
+        })
+      }
 
   },
 
@@ -132,10 +139,8 @@ h1{
 .btnBrisi{
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     border: none;
-    background: #423d42;
-    color: #e7dde7;
-    font-size: 16px;
-    padding: 10px;
+    background: transparent;
+    padding: 3px;
     float: right;
     margin-top: -35px;
     margin-right: 30px;
@@ -145,7 +150,7 @@ h1{
 
 .btnBrisi:hover{
     color: #ddd8dd;
-    background: #736f79;
+    background: #d9d5e0;
 }
 
 .btnDodajOglase{
@@ -169,7 +174,7 @@ h1{
   height: 250px;
   margin: 20px 0px 20px 55px;
   border: 3px solid #d0cad6;
-  cursor: pointer;
+ 
   
 }
 
@@ -181,7 +186,7 @@ h1{
 }
 
 
-.cenaOglasa{
+.cenaOglasa, .ukloniBtn{
   float: right;
   color: #ac3636;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -197,6 +202,7 @@ h1{
   align-self: center;
   margin: auto;
   object-fit: contain;
+  cursor: pointer;
 }
 
 .nazivOglasa{
@@ -208,7 +214,7 @@ h1{
   overflow: hidden;
 }
 
-.nazivOglasa, .cenaOglasa{
+.nazivOglasa, .cenaOglasa, .ukloniBtn{
    display: inline-block;
 
 }
@@ -219,5 +225,32 @@ h1{
   flex-direction: row;
   flex-wrap: wrap;
 }
+
+.ukloniBtn{
+  width: 45px;
+  height: 45px;
+  /*margin-left: 210px; */ 
+  margin: -5px 0 0 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: #423d42;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+}
+
+.ukloniSlika{
+  height: 35px;
+  width: auto;
+  padding: -2px;
+}
+
+.manageIcons{
+  height: 40px;
+  width: auto;
+}
+
+
 
 </style>
