@@ -14,6 +14,7 @@
                 v-model="kategorija.opis"
                 rows="7"
                 max-rows="8"
+                resize="none"
     ></textarea>
             </div>
           </div>
@@ -206,6 +207,9 @@ legend{
   color: #d8d5cf;
 }
 
+textarea{
+  resize: none;
+}
 
 
 </style>

@@ -15,7 +15,7 @@
       </div>
       
     <div v-if="this.$session.exists() && kupac && !prijavljenProdavac" class="dodajNovi">
-          <button class="dugmeDodaj"  v-on:click="prijavi">Prijavi prodavca</button>
+          <button class="dugmeDodaj" v-on:click="prijavi">Prijavi prodavca</button>
       </div>
 
       </div>

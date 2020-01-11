@@ -53,6 +53,10 @@
     </div>
     </div>
 
+
+
+
+
     <modal name="categ" class="modalKat"
          :height="500"
          :width="270"
@@ -65,11 +69,83 @@
         </div>
       
     </modal>
-    
+   
+
+
+
+
+
 <div class="recenzije">
   <h2 class="naslovRecenzije">Recenzije kupaca:</h2>
 
+  <form name="recenzijaForm" v-if="kupio" @submit.prevent="dodajNovuRecenziju">
+    <h2 class="dodajRecNaslov">Dodaj recenziju</h2>
+    <div class="celaForma">
+    <div class="recSve">
+
+      <div class="recPrviDeo">
+         <legend class="slikaLegend">Slika:</legend>
+          <div class="image-preview">
+            <img class="preview"  v-if="recenzija.slika.length > 0" :src="recenzija.slika">
+          </div>
+          <input type="file" @change="onFileSelected" accept="image/*" class="photoInput" >
+      </div>
+
+      <div class="recDrugiDeo">
+        <legend class="sadrzajLegend" >Naslov recenzije:</legend>
+        <input type="text" v-model="recenzija.naziv" class="recNaslov" />
+        <legend class="sadrzajLegend">Opis recenzije:</legend>
+        <textarea cols="40" v-model="recenzija.sadrzaj" rows="6"/>
+      </div>
+
+      <div class="recTreciDeo">
+        <legend class="sadrzajLegend">Da li je opis oglasa tačan:</legend>
+        <div class="radioPrvi">
+        <input type="radio" id="da" value="true" v-model="recenzija.tacanOglas">
+        <label class="labelRadio" name="tacanOglas" for="da">Da</label>
+        <input type="radio" id="ne" value="false" v-model="recenzija.tacanOglas">
+        <label class="labelRadio" name="tacanOglas" for="ne">Ne</label>
+      </div>
+
+        <legend class="sadrzajLegend">Da li je opis dogovor ispoštovan:</legend>
+        <div class="radioPrvi">
+        <input type="radio" id="Da" value="true" v-model="recenzija.ispostovan">
+        <label class="labelRadio" name="ispostovanOglas" for="Da">Da</label>
+        <input type="radio" id="Ne" value="false" v-model="recenzija.ispostovan">
+        <label class="labelRadio" name="ispostovanOglas" for="Ne">Ne</label>
+      </div>
+      </div>
+    </div>
+    <input class="btnRecenzije" type="submit" value="Dodaj">
+    </div>
+  </form> 
+
+
+
+
+
+<h1>RECENZIJEEE</h1>
+  <div class="recPregled" v-for="rec in recenzije" v-bind:key="rec.naziv" >
+     
+      <div class="gore">
+        <h3 class="naslovRecPregl"> {{ rec.naziv }}</h3>
+        <h4 class="textRecPregl">{{ rec.sadrzaj }}</h4>
+      </div>
+      <div class="slika">
+      <img class="imgRecPregl" v-bind:src="`${rec.slika}`">
+      </div>
+
+    </div>
+
+
+
+
 </div>
+
+
+
+
+
 
 </div>
 </template>
@@ -89,12 +165,22 @@ export default {
       obrisan: false,
 
       kupac: false,
+      kupio: false,
       admin: false,
       prodavac: false,
       autor: false,
 
       kategorije: {},
       oglasModal: {},
+      recenzije: {},
+
+      recenzija:{
+        recezent: "",
+        oglas: "",
+        slika: "",
+        tacanOglas: true,
+        ispostovan: true,
+      },
       //kategorijeModal: {},
 
 
@@ -113,6 +199,7 @@ export default {
     }
 
   },
+
 
   methods: {
     favorite : function(){
@@ -190,7 +277,7 @@ export default {
         this.$http.post(`http://localhost:9090/WebProj/article/category/${naziv}`, this.oglasModal, {textHeaders:this.textHeaders}).then(response =>{
           console.log(this.oglasModal)
           alert('Oglas je uspesno dodat u kategoriju!')
-          this.hide()
+          this.$router.go()
         }, (response) => {
             if(response.status == 400){
               alert('Oglas se vec nalazi u ovoj kategoriji!');
@@ -201,7 +288,37 @@ export default {
           otvori(naziv){
             this.$router.push({name:'categoryName', params:{id:naziv}})
             //this.$router.go()
-    }
+    },
+
+    onFileSelected(event) {
+      var input = event.target;
+
+      if (input.files && input.files[0]) {
+                // create a new FileReader to read this image and convert to base64 format
+                var reader = new FileReader();
+                // Define a callback function to run, when FileReader finishes its job
+                reader.onload = (e) => {
+                    // Note: arrow function used here, so that "this.imageData" refers to the imageData of Vue component
+                    // Read image as base64 and set to imageData
+                    this.recenzija.slika = e.target.result;
+                }
+                // Start the reader job - read file as a data url (base64 format)
+                reader.readAsDataURL(input.files[0]);
+            }
+        },
+
+        dodajNovuRecenziju : function() {
+           this.$http.post('http://localhost:9090/WebProj/addreview', this.recenzija, {headers:this.headers}).then(response =>{
+          //console.log(this.recenzija)
+          alert('Recenzija je uspesno objavljena!')
+          this.$router.go()
+        }, (response) => {
+            if(response.status == 400){
+              alert('Doslo je do greska pri objavljivanju recenzije!');
+           }
+          })
+
+        }
 
 
     },
@@ -211,8 +328,10 @@ export default {
 
 
   beforeCreate(){
+
     this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
         this.oglas = response.body;
+        this.recenzija.oglas = response.body.naziv;
 
         if(this.oglas.stanje === "OBRISAN"){
           this.obrisan = true;
@@ -241,6 +360,7 @@ export default {
         response.body.dostavljeniProizvodi.forEach(element => {
           if(element === this.$route.params.id){
             this.dostavljen = true;
+            this.recenzija.recezent = response.body.korisnickoIme;
 
           }                  
 
@@ -248,6 +368,9 @@ export default {
 
           if(response.body.uloga === "KUPAC"){
             this.kupac = true;
+            if(this.oglas.stanje === "DOSTAVLJEN"){
+              this.kupio = true;
+            }
           } else if (response.body.uloga === "ADMINISTRATOR"){
             this.admin = true;
           } else if (response.body.uloga === "PRODAVAC"){
@@ -268,11 +391,18 @@ export default {
   },
 
   created(){
+      
       this.$http.get('http://localhost:9090/WebProj/categoryinfo').then(response => {
           
           this.kategorije = response.body;
-          
-      }) 
+      }),
+
+      this.$http.get(`http://localhost:9090/WebProj/reviews/${this.$route.params.id}`).then(response => {
+          this.recenzije = response.body;
+          console.log(response.body)
+      })
+
+
   }
 
 }
@@ -312,7 +442,7 @@ export default {
 
 }
 
-.naslov, .naslovRecenzije{
+.naslov{
     color: #7e747e;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     text-align: left;
@@ -534,7 +664,8 @@ li{
     color: #4c464e;
     list-style: none;
     padding: 7px;
-    width: 200px;
+    
+    
     
 }
 
@@ -549,12 +680,6 @@ li:hover {
     cursor: pointer;
 }
 
-.recenzije{
-  margin-top: 90px;
-  /* border: 1px solid black; */
-  width: 300;
-  height: auto;
-}
 
 .viewCateg{
       font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -562,10 +687,9 @@ li:hover {
     display: inline;
     text-overflow: clip;
     padding: 5px;
-    margin: 3px;
-    background-color: #f1edf5;
-    width: auto;
+    margin: 3px; 
 
+    background-color: #f1edf5;
 }
 
 .stanje{
@@ -574,6 +698,161 @@ li:hover {
   flex-wrap: wrap;
 }
 
+.recenzije{
+  margin-top: 40px;
+  /* border: 1px solid black; */
+
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.naslovRecenzije{
+    color: #7e747e;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    text-align: left;
+    margin-left: 15px;
+
+}
+
+
+.dodajRecNaslov{
+  color: #928c92;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  margin: 10px 0 30px 45px;
+}
+
+
+.btnRecenzije{
+  color: #3d383d;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  height: 40px;
+  width: 74px;
+  float: right;
+  margin: 0 30px 10px 0;
+  outline: none;
+  border:none;
+  background-color:#cec7db;
+  cursor: pointer;
+  box-shadow: 2px 3px 3px rgb(214, 209, 221);
+
+}
+
+.btnRecenzije:hover{
+  background-color:#b6b0c2;
+}
+
+.preview{
+  max-width: 156px;
+  max-height: 165px;
+  
+}
+
+.image-preview{
+  width: 160px;
+  height: auto;
+  min-height: 160px;
+  padding: 5px;
+  border: 1px solid #a79fa7;
+  margin: 5px 10px 10px 45px;
+  box-shadow: 1px 1px 3px #8f868f;
+  background-color: #faf9fa;
+  align-content: center;
+}
+
+.photoInput{
+  margin: 0 0 40px 45px;
+}
+
+.slikaLegend{
+    
+    text-align: left;
+    color: #504850;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    margin-bottom: 15px;
+    margin-left: 45px;
+   
+}
+
+.sadrzajLegend{
+  text-align: left;
+    color: #504850;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    margin-bottom: 10px;
+}
+
+
+.dugmeRec{
+  margin: 10px 0 0 -10px;
+}
+
+form{
+  border: 1px solid rgb(186, 184, 190);
+  padding: 9px;
+  box-shadow: 3px 3px 3px rgb(205, 201, 207);
+  margin: 1% 13% 10% 5%;
+
+}
+
+.recNaslov{
+  width: 90%;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  padding: 5px;
+  outline: none;
+  margin: 0 0 20px 0;
+}
+
+textarea{
+  resize: none;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  outline: none;
+  padding: 7px;
+  width: 90%;
+}
+
+.labelRadio{
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: #504850;
+  
+}
+
+.radioPrvi{
+  margin-bottom: 40px;
+}
+
+.recSve{
+  display: flex;
+  flex-direction: row;
+}
+
+.recPrviDeo{
+  width: 30%;
+    display: flex;
+  flex-direction: column;
+}
+
+.recDrugiDeo{
+  width: 50%;
+    display: flex;
+  flex-direction:  column;
+  margin-left: -60px;
+}
+
+.recTreciDeo{
+  width: 20%;
+    display: flex;
+  flex-direction: column;
+  margin-top: 25px;
+}
+
+.recPregled{
+  margin: 200px 10px 10px 10px;
+}
 
 
 </style>
