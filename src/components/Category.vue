@@ -1,6 +1,6 @@
 <template>
     <div class="kategorijaContainter">
-        <button v-if="this.$session.exists() && admin" title="Obrisi kategoriju"  v-on:click="obrisiKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/bin.svg"></button>
+        <button v-if="this.$session.exists() && admin" title="Obriši kategoriju"  v-on:click="obrisiKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/bin.svg"></button>
         <button v-if="this.$session.exists() && admin" title="Izmeni kategoriju"  v-on:click="izmeniKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/edit.svg"></button>
         <h1>{{kategorija.naziv}}</h1>
         <p class="opisKat">{{kategorija.opis}}</p>

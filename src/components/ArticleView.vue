@@ -31,7 +31,7 @@
       <label class="dolebroj">{{ oglas.brDislajkova }}</label>
 
 
-      <img class="fav" v-on:click="favorite" v-if="this.$session.exists() && !omiljen && kupac"  src="../assets/heart.svg">
+      <img class="fav" v-on:click="favorite" v-if="this.$session.exists() && !omiljen && kupac && !dostavljen && !narucen"  src="../assets/heart.svg">
       <img class="fav" v-on:click="removeFav" v-if="this.$session.exists() && omiljen && kupac"  src="../assets/redheart.svg">
 
       </div>
@@ -76,8 +76,8 @@
 
 
 <div class="recenzije">
+  
   <h2 class="naslovRecenzije">Recenzije kupaca:</h2>
-
   <form name="recenzijaForm" v-if="kupio" @submit.prevent="dodajNovuRecenziju">
     <h2 class="dodajRecNaslov">Dodaj recenziju</h2>
     <div class="celaForma">
@@ -123,18 +123,28 @@
 
 
 
-
-<h1>RECENZIJEEE</h1>
-  <div class="recPregled" v-for="rec in recenzije" v-bind:key="rec.naziv" >
-     
-      <div class="gore">
-        <h3 class="naslovRecPregl"> {{ rec.naziv }}</h3>
-        <h4 class="textRecPregl">{{ rec.sadrzaj }}</h4>
-      </div>
-      <div class="slika">
+<div v-if="!izmenaRecenzije"> 
+  <div class="recPregled" v-for="rec in recenzije" v-bind:key="rec.idRec" >
+  
+    <div class="slika">
       <img class="imgRecPregl" v-bind:src="`${rec.slika}`">
-      </div>
+    </div>
+    <div class="gore">
+      <p class="kupacRec">Kupac: {{ rec.recezent }}</p>
+      <p class="naslovRecPregl"> {{ rec.naziv }}</p>
+      <p class="textRecPregl">{{ rec.sadrzaj }}</p>
+    </div>
+    <div class="radioPregled">
+     <p v-if="rec.tacanOglas" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/correct.svg">Tačan oglas</p>
+     <p v-if="!rec.tacanOglas" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/wrong.svg">Tačan oglas</p>
+     <p v-if="rec.ispostovan" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/correct.svg">Ispoštovan oglas</p>
+     <p v-if="!rec.ispostovan" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/wrong.svg">Ispoštovan oglas</p>
 
+     <button v-if="kupio" title="Obriši recenziju"  class="btnBrisiRecPreg" v-on:click="obrisiRecenziju(rec.idRec)" ><img class="manageIcons" src="../assets/bin.svg"></button>
+      <button v-if="kupio" title="Izmeni recenziju"  class="btnBrisiRecPreg" v-on:click="izmeniRecenziju(rec.idRec)"><img class="manageIcons" src="../assets/edit.svg"></button>
+
+    </div>
+</div>
     </div>
 
 
@@ -181,7 +191,7 @@ export default {
         tacanOglas: true,
         ispostovan: true,
       },
-      //kategorijeModal: {},
+      izmenaRecenzije: false,
 
 
 
@@ -261,7 +271,7 @@ export default {
       },
 
       beforeOpen (event) {
-        console.log(event.params.foo);
+        //console.log(event.params.foo);
         this.oglasModal = event.params.foo.naziv;
  
       },
@@ -275,7 +285,7 @@ export default {
 
       dodaj(naziv){
         this.$http.post(`http://localhost:9090/WebProj/article/category/${naziv}`, this.oglasModal, {textHeaders:this.textHeaders}).then(response =>{
-          console.log(this.oglasModal)
+          //console.log(this.oglasModal)
           alert('Oglas je uspesno dodat u kategoriju!')
           this.$router.go()
         }, (response) => {
@@ -308,6 +318,7 @@ export default {
         },
 
         dodajNovuRecenziju : function() {
+          if(!this.izmenaRecenzije){
            this.$http.post('http://localhost:9090/WebProj/addreview', this.recenzija, {headers:this.headers}).then(response =>{
           //console.log(this.recenzija)
           alert('Recenzija je uspesno objavljena!')
@@ -317,9 +328,31 @@ export default {
               alert('Doslo je do greska pri objavljivanju recenzije!');
            }
           })
+          } else {
+            this.$http.post(`http://localhost:9090/WebProj/review/edit`, this.recenzija ,{headers:this.headers}).then(() => {
+            alert('Recenzija je izmenjena!');
+            this.izmenaRecenzije = false,
+            this.$router.go();
+            })
+          }
 
-        }
+        },
 
+        izmeniRecenziju(idRec) {
+          this.$http.get(`http://localhost:9090/WebProj/reviewinfo/${idRec}`).then((response) => {
+            this.recenzija = response.body;
+            this.izmenaRecenzije = true
+            //this.$router.go()
+          })
+      },
+
+      obrisiRecenziju(idRec) {
+        this.$http.post(`http://localhost:9090/WebProj/review/delete/${idRec}` ,{headers:this.headers}).then(() => {
+          alert('Recenzija je obrisana!');
+          this.$router.go()
+        })
+      }
+      
 
     },
 
@@ -399,9 +432,9 @@ export default {
 
       this.$http.get(`http://localhost:9090/WebProj/reviews/${this.$route.params.id}`).then(response => {
           this.recenzije = response.body;
-          console.log(response.body)
+          //console.log(response.body)
       })
-
+       
 
   }
 
@@ -731,7 +764,7 @@ li:hover {
   height: 40px;
   width: 74px;
   float: right;
-  margin: 0 30px 10px 0;
+  margin: 0 30px -70px 0;
   outline: none;
   border:none;
   background-color:#cec7db;
@@ -792,7 +825,7 @@ form{
   border: 1px solid rgb(186, 184, 190);
   padding: 9px;
   box-shadow: 3px 3px 3px rgb(205, 201, 207);
-  margin: 1% 13% 10% 5%;
+  margin: 1% 13% 5% 5%;
 
 }
 
@@ -837,22 +870,96 @@ textarea{
 }
 
 .recDrugiDeo{
-  width: 50%;
+  width: 60%;
     display: flex;
   flex-direction:  column;
   margin-left: -60px;
 }
 
 .recTreciDeo{
-  width: 20%;
+  width: 10%;
     display: flex;
   flex-direction: column;
   margin-top: 25px;
 }
 
 .recPregled{
-  margin: 200px 10px 10px 10px;
+  margin: 25px 5px 10px 40px;
+  display: flex;
+  flex-direction: row;
+  background-color: #f5f5f7;
+  width: 86%;
+  min-height: 165px;
 }
 
+
+.imgRecPregl{
+    width: auto;
+  max-height: 140px;
+  max-width: 190px;
+  align-self: center;
+  margin: 4px;
+  object-fit: contain;
+}
+
+.gore{
+  width: 65%;
+  padding: 0 3%;
+}
+
+.kupacRec{
+   font-family: 'Avenir', Helvetica, Arial, sans-serif;
+   font-size: 18px;
+  color: #504850;
+}
+
+.naslovRecPregl{
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+   font-size: 21px;
+  color: #504850;
+}
+
+.textRecPregl{
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+   font-size: 16px;
+  color: #504850;
+}
+
+
+.ikonicaTacan{
+  width: 20px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.prviRadioPregl{
+font-family: 'Avenir', Helvetica, Arial, sans-serif;
+   font-size: 16px;
+  color: #504850;
+  margin-left: 4px;
+
+}
+
+.manageIcons{
+  height: 30px;
+  width: auto;
+}
+
+.btnBrisiRecPreg{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    border: none;
+    background: white;
+    padding: 3px;
+    float: right;
+    margin-top: 10%;
+    margin-right: 9px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    cursor:pointer;
+}
+
+.btnBrisiRecPreg:hover{
+    color: #ddd8dd;
+    background: #d9d5e0;
+}
 
 </style>

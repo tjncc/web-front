@@ -31,5 +31,6 @@ export default[
     { path: '/add-category', component: AddCategory },
     { path: '/category/:id', name: 'categoryName', components: {default: Category, side: SideBar} },
     { path: '/edit-category/:id', name: 'editCat', component: AddCategory },
-    { path: '/add-category-articles', component: ArticleCategory },
+    { path: '/add-category-articles', component: ArticleCategory }
+
 ]

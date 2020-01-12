@@ -43,8 +43,26 @@
     </div>
     </div>
  
+
+ 
     <div class="desno">
         <h2 class="recenzijeNaslov">Recenzije</h2>
+        <div class="recenzijePrikazProfil" v-for="rec in recenzije" v-bind:key="rec.idRec">
+         <p class="oglasRec">Oglas: <a v-on:click="otvori(rec.oglas)" class="oglasNazivRec" >{{ rec.oglas }}</a></p>
+         <p class="oglasRec">Recezent: {{ rec.recezent }}</p>
+            <p class="nazivRec">{{ rec.naziv }}</p>           
+            <p class="sadrzajRec">{{ rec.sadrzaj }}</p>
+
+        <div class="radios">
+            <p v-if="rec.tacanOglas" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/correct.svg">Tačan oglas</p>
+            <p v-if="!rec.tacanOglas" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/wrong.svg">Tačan oglas</p>
+            <p v-if="rec.ispostovan" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/correct.svg">Ispoštovan oglas</p>
+            <p v-if="!rec.ispostovan" class="prviRadioPregl"><img class="ikonicaTacan" src="../assets/wrong.svg">Ispoštovan oglas</p>
+        </div>
+            <img class="imgRec" :src="rec.slika">
+
+        </div>
+
     </div>
       
 
@@ -69,6 +87,8 @@ export default {
         realizacijaOglasi: [],
         dostavljeniOglasi: [],
         oglasiPrikaz: [],
+
+        recenzije: {},
     }
   },
 
@@ -82,7 +102,7 @@ export default {
         },
 
         selectChange(){
-            console.log(event);
+            //console.log(event);
             switch(event.target.value) {
 
             case "Aktivan":
@@ -102,11 +122,10 @@ export default {
         this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           this.sellerInfo.korisnickoIme = response.body.korisnickoIme;
           this.sellerInfo.uloga = response.body.uloga;
-
-        }, (response) => {
-            if (response.status === 400){
-                alert('Neuspesno ucitavanje podataka');
-            }
+          
+            this.$http.get(`http://localhost:9090/WebProj/reviews-seller/${response.body.korisnickoIme}`).then((response) => {
+                this.recenzije = response.body;
+            })
         }),
 
          this.$http.get('http://localhost:9090/WebProj/articleinfo' ,{headers:this.headers}).then((response) => {
@@ -139,9 +158,11 @@ export default {
              });
              
         })
+
+        
+
+        
         }
-    
-    
 
 }
 </script>
@@ -353,7 +374,72 @@ export default {
 
 }
 
+.recenzijePrikazProfil{
+    background-color: #f8f5fa;
+    margin: 13px 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    box-shadow: 2px 2px 2px #e1dfe2;
+}
 
+.oglasNazivRec{
+    color: #423d42;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 19px;
+  cursor: pointer;
+  padding: 3px;
+  background-color: #e5e4e6;
+    border-radius: 5px;
+}
 
+.oglasNazivRec:hover{
+    color: #000000;
+    background-color: #e2dee4;
+
+}
+
+.oglasRec{
+     color: #423d42;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  margin-bottom: -5px;
+  text-align: left;
+}
+
+.nazivRec{
+color: #423d42;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 19px;
+}
+
+.sadrzajRec{
+    color: #423d42;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+}
+
+.imgRec{
+    width: auto;
+    max-width: 80px;
+    max-height: 70px;
+    object-fit: contain;
+}
+
+.prviRadioPregl{
+    color: #423d42;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+}
+
+.ikonicaTacan{
+    max-width: 16px;
+    margin-right: 5px;
+    margin-left: 20px;
+}
+
+.radios{
+    display: flex;
+    margin-left: 8%;
+}
 
 </style>
