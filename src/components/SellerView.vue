@@ -175,8 +175,12 @@ export default {
 
         prijavi() {
             if(this.prijavljenProdavac === false){
-                this.$http.post(`http://localhost:9090/WebProj/userreport/${this.$route.params.id}`,{headers:this.headers}).then((response) => {
+                this.$http.post(`http://localhost:9090/WebProj/userreport/${this.$route.params.id}`,this.$session.get('idOne'), {headers:this.headers}).then((response) => {
                     this.prijavljenProdavac = true;
+                }, (response) => {
+            if(response.status == 400){
+              alert('Već ste prijavili ovog prodavca!');
+           }
             }) 
         }
         },

@@ -14,6 +14,9 @@ import SellerView from './components/SellerView'
 import AddCategory from './components/AddCategory'
 import Category from './components/Category'
 import ArticleCategory from './components/SelectArticlesCategory'
+import Messages from './components/Messages'
+import CreateMessage from './components/CreateMessage'
+import OneMessage from './components/OneMessage'
 
 export default[
     { path:'/', components: {default: HomePage, header: SearchBar, side: SideBar }},
@@ -31,6 +34,12 @@ export default[
     { path: '/add-category', component: AddCategory },
     { path: '/category/:id', name: 'categoryName', components: {default: Category, side: SideBar} },
     { path: '/edit-category/:id', name: 'editCat', component: AddCategory },
-    { path: '/add-category-articles', component: ArticleCategory }
+    { path: '/add-category-articles', component: ArticleCategory },
+    { path: '/messages', component: Messages },
+    { path: '/create/message', component: CreateMessage },
+    { path: '/message/:id', name: 'msg', component: OneMessage },
+    { path: '/message/response/:id', name: 'response', component: CreateMessage },
+    { path: '/message/article/:id', name: 'articleMessage', component: CreateMessage }
+
 
 ]

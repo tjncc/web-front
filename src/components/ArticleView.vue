@@ -45,11 +45,15 @@
         </div>
         <button v-if="this.$session.exists() && !narucen && !dostavljen && kupac" class="dugme" v-on:click="order" >Poruči</button>
         <button v-if="this.$session.exists() && narucen && !dostavljen && kupac" class="dugme2" v-on:click="delivered" >Dostavljeno</button>
-        <button v-if="this.$session.exists() && admin && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
+        <button v-if="this.$session.exists() && admin && !obrisan" class="dugme" v-on:click="editAdmin" >Izmeni</button>
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
         <button v-if="this.$session.exists() && autor && !obrisan" class="dugme" v-on:click="edit" >Izmeni</button>
-        <button v-if="this.$session.exists() && autor && !obrisan" class="dugmeObrisi" v-on:click="deleteArticle" >Obriši</button>
+        <button v-if="this.$session.exists() && autor && !obrisan" class="dugmeObrisi" v-on:click="deleteArticleSeller" >Obriši</button>
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="show" >Dodaj kategoriju</button>
+        <button v-if="this.$session.exists() && kupac && !obrisan" class="dugme3" v-on:click="posaljiPoruku" >Pošalji poruku</button>
+        <button v-if="this.$session.exists() && admin && !obrisan" class="dugme3" v-on:click="posaljiPoruku" >Pošalji poruku</button>
+         <button v-if="this.$session.exists() && kupac && !obrisan && !prijavljen" class="dugme3" v-on:click="prijaviOglas" >Prijavi oglas</button>
+
     </div>
     </div>
 
@@ -192,6 +196,7 @@ export default {
         ispostovan: true,
       },
       izmenaRecenzije: false,
+      prijavljen: false,
 
 
 
@@ -255,14 +260,29 @@ export default {
       },
 
       deleteArticle : function(){
-        this.$http.post(`http://localhost:9090/WebProj/article/delete/${this.$route.params.id}`, this.$session.get('idOne'),{headers:this.headers}).then(() =>{
+        this.$http.post(`http://localhost:9090/WebProj/article/delete/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+          alert('Oglas je obrisan!')
           this.obrisan = true;
-          this.$emit('changedView');
+          this.$router.push('/admin-profile')
           
         })
       },
 
+       deleteArticleSeller : function(){
+        this.$http.post(`http://localhost:9090/WebProj/article/seller-delete/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+          alert('Oglas je obrisan!')
+          this.obrisan = true;
+          this.$router.push('/seller-profile')
+          
+        })
+      },
+
+
       edit : function(){
+          this.$router.push({name:'edit', params:{id:this.oglas.naziv}})
+      },
+
+      editAdmin : function(){
           this.$router.push({name:'edit', params:{id:this.oglas.naziv}})
       },
 
@@ -351,6 +371,21 @@ export default {
           alert('Recenzija je obrisana!');
           this.$router.go()
         })
+      },
+
+      posaljiPoruku : function() {
+        this.$router.push({name:'articleMessage', params:{id:this.oglas.naziv}})
+      },
+
+      prijaviOglas : function() {
+         this.$http.post(`http://localhost:9090/WebProj/report/article/${this.$route.params.id}`,this.$session.get('idOne') ,{headers:this.headers}).then(() => {
+           alert('Oglas je prijavljen!');
+           this.prijavljen = true;
+         }, (response) => {
+            if(response.status == 400){
+              alert('Već ste prijavili ovaj oglas!');
+           }
+         })
       }
       
 
@@ -643,6 +678,19 @@ export default {
 
 }
 
+.dugme3{
+  background-color: #6c6377;
+    color:#e9e0e9;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 18px;  
+    border: none;
+    width: 170px;
+    height: 37px;
+    margin: 10px 0 0 90px;
+    cursor:pointer;
+    box-shadow: 0px 7px 10px rgba(0, 0, 0, 0.1);
+}
+
 .dugme2{
     background-color: #e9e0e9;
     color:#696469;
@@ -674,7 +722,7 @@ export default {
 
 }
 
-.dugme:hover, .dugmeObrisi:hover{
+.dugme:hover, .dugmeObrisi:hover, .dugme3:hover{
       background-color: #3b393b;
 }
 

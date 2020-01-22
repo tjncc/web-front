@@ -7,17 +7,18 @@
         <router-link class="levo" v-if="this.$session.exists() && kupac" to="/buyer-profile">Profil</router-link>
         <router-link class="levo" v-if="this.$session.exists() && admin" to="/admin-profile">Profil</router-link>
         <router-link class="levo" v-if="this.$session.exists() && prodavac" to="/seller-profile">Profil</router-link>
-    <div class="dropdown">
+        
+    <div class="dropdown">  
     <button class="profil"><img src="../assets/account.svg">
     </button>
         <div class="dropdown-content">
             <router-link v-if="!this.$session.exists()" class="desno" to="/login">Prijava</router-link>
             <router-link v-if="!this.$session.exists()" class="desno" to="/register">Registracija</router-link>
             <button v-if="this.$session.exists()" v-on:click.prevent="logout">Odjavi se</button>
-        </div>
-    
-    </div>
+        </div>   
+      </div>
 
+      <button class="poruka" v-if="this.$session.exists()" v-on:click="otvoriPoruke"><img class="imgPoruka" src="../assets/mail.svg"><h4 v-if="brNeprocitanih != 0" class="neprocitanePor">{{ this.brNeprocitanih }}</h4></button>
     </div>
 
 </header>
@@ -33,6 +34,9 @@ export default {
         kupac: false,
         admin: false,
         prodavac: false,
+
+        poruke: {},
+        brNeprocitanih: 0,
 
         headers : {
           'Content-Type' : 'application/json'
@@ -53,6 +57,10 @@ export default {
         }, () =>{
             alert('Neuspešna odjava!');
         })
+    },
+
+    otvoriPoruke : function() {
+      this.$router.push('/messages');
     }
   },
 
@@ -70,6 +78,17 @@ export default {
       } else if (response.body.uloga === "PRODAVAC"){
         this.prodavac = true;
       }
+
+
+        this.$http.get(`http://localhost:9090/WebProj/messages/${response.body.korisnickoIme}`,{headers:this.headers}).then((response) => {
+            this.poruke = response.body;
+            response.body.forEach(element => {
+              if(element.procitana === false){
+                this.brNeprocitanih += 1;
+              }
+            });
+
+        })
     })
       
   }
@@ -176,6 +195,29 @@ button{
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   text-decoration: none;
 
+}
+
+.poruka{
+  display: flex;
+  float: right;
+  height: 50px;
+  width: 55px;
+  outline: none;
+  border: none;
+}
+
+.imgPoruka{
+  width: 26px;
+}
+
+.neprocitanePor{
+  background-color: rgb(211, 2, 2);
+  margin: -6px 5px 0 -10px;
+  padding: 3px 4px;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  border-radius: 50%;
+  
+  
 }
 
 </style>

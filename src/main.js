@@ -9,7 +9,7 @@ import VModal from 'vue-js-modal'
 Vue.use(VueRouter);
 Vue.use(VueResource);
 Vue.use(VueSession);
-Vue.use(VModal, { resizable: true } )
+Vue.use(VModal, { resizable: true, dynamic: true, injectModalsContainer: true  } )
 
 const router = new VueRouter({
   routes: Routes,

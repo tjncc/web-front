@@ -61,6 +61,7 @@ export default {
       },
       izmena: false,
 
+
     }
   },
   methods : {
@@ -96,6 +97,8 @@ export default {
             alert('Oglas je izmenjen!');
             this.$router.push(`/articleinfo/${this.$route.params.id}`);
             })
+
+          
         }
         },
 
@@ -121,10 +124,11 @@ export default {
         this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
           this.oglas = response.body;
           this.izmena = true;
-          console.log(this.izmena);
 
       })
+
       
+    
     }
     }
 
