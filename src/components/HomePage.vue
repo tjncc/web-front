@@ -78,23 +78,24 @@ export default {
 
 .oglas{
   width: 215px;
-  height: 215px;
+  height: 235px;
   margin: 20px 0px 20px 20px;
   border: 3px solid #d0cad6;
   cursor: pointer;
+  align-self: center;
+  display:flex;
+  flex-direction: column;
   
 }
 
 img{
   width: auto;
-  max-height: 165px;
-  max-width: 215px;
+  max-height: 185px;
+  max-width: 210px;
   align-self: center;
-  margin: auto;
+  margin: 4px;
   object-fit: contain;
-  
-  
-  
+  cursor: pointer;
 }
 
 .gore{

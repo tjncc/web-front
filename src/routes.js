@@ -41,5 +41,4 @@ export default[
     { path: '/message/response/:id', name: 'response', component: CreateMessage },
     { path: '/message/article/:id', name: 'articleMessage', component: CreateMessage }
 
-
 ]

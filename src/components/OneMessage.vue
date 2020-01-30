@@ -88,10 +88,12 @@ export default {
                 if(response.body.posiljalac === "admin"){
                     this.poslaoAdmin = true;
                 }
-                if(response.body.posiljalac == "Automatska poruka"){
+                if(response.body.posiljalac === "Automatska poruka"){
                     this.automatska = true;
                 }
             })
+      } else {
+          this.$router.push('/');
       }
   },
 

@@ -400,35 +400,7 @@ export default {
 
 
   beforeCreate(){
-
-        this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
-        this.oglas = response.body;
-        this.recenzija.oglas = response.body.naziv;
-
-        if(this.oglas.stanje === "OBRISAN"){
-          this.obrisan = true;
-          this.omiljen = false;
-          this.narucen = false;
-          this.dostavljen = false;
-        }
-
-        response.body.lajkovali.forEach(element => {
-          if(element === this.ulogovan){
-            this.lajkovaoVec = true;
-          }
-        });
-
-        response.body.prijavili.forEach(element => {
-          if(element === this.ulogovan){
-            this.prijavioVec = true;
-          }
-        });
-
-    })
-
-
-
-
+    
         if (this.$session.exists()) {
       this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
         this.ulogovan = response.body.korisnickoIme;
@@ -459,12 +431,8 @@ export default {
 
           if(response.body.uloga === "KUPAC"){
             this.kupac = true;
-            console.log('usao');
-            console.log
             if(this.oglas.stanje === "DOSTAVLJEN"){
               this.kupio = true;
-              console.log('ovo gledaj')
-              console.log(this.kupio)
             }
           } else if (response.body.uloga === "ADMINISTRATOR"){
             this.admin = true;
@@ -481,9 +449,40 @@ export default {
         }
 
 
+        this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
+        this.oglas = response.body;
+        this.recenzija.oglas = response.body.naziv;
+
+        if(this.oglas.stanje === "OBRISAN"){
+          this.obrisan = true;
+          this.omiljen = false;
+          this.narucen = false;
+          this.dostavljen = false;
+        }
+
+        if(this.oglas.stanje === "DOSTAVLJEN"){
+          if(this.kupac === true){
+            this.kupio = true;
+          }
+        }
+
+        response.body.lajkovali.forEach(element => {
+          if(element === this.ulogovan){
+            this.lajkovaoVec = true;
+          }
+        });
+
+        response.body.prijavili.forEach(element => {
+          if(element === this.ulogovan){
+            this.prijavioVec = true;
+          }
+        });
+
+    })
   },
 
-  created(){
+
+created(){
       
       this.$http.get('http://localhost:9090/WebProj/categoryinfo').then(response => {
           

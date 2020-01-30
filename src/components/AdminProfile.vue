@@ -9,7 +9,7 @@
     <div class="svikorisnici">
     <div class="korisnik" v-for="user in users" v-bind:key="user.korisnickoIme" >
      
-        <h2 class="nazivKorisnika"> {{ user.korisnickoIme }}</h2>
+        <h2 class="nazivKorisnika" v-on:click="prodavacPregled(user.korisnickoIme)"> {{ user.korisnickoIme }}</h2>
         <h4 class="uloga" >{{ user.uloga }}</h4>
         <button class="promeniUlogu" v-on:click="promeniUlogu(user.korisnickoIme)">Promeni ulogu</button>
 
@@ -47,7 +47,15 @@ export default {
             this.$emit('changedView');
       })
      
-      }
+      },
+
+      prodavacPregled : function(kIme){
+        this.$http.post(`http://localhost:9090/WebProj/sellerinfo/${kIme}` ,{headers:this.headers}).then((response) => {
+           if (response.body.uloga === "PRODAVAC"){
+            this.$router.push({name:'sellerName', params:{id:kIme}});
+           }
+      })
+      },
     
     
   },
@@ -69,14 +77,18 @@ export default {
          
          if(response.body.uloga === "KUPAC"){
             this.kupac = true;
+            this.$router.push('/');
           } else if (response.body.uloga === "ADMINISTRATOR"){
             this.admin = true;
           } else if (response.body.uloga === "PRODAVAC"){
             this.prodavac = true;
+            this.$router.push('/');
           }
 
      
       })
+    } else {
+      this.$router.push('/');
     }
     }
 

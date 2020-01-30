@@ -115,8 +115,12 @@ export default {
     },
 
     created(){
+
       this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
         this.oglas.prodavac = response.body.korisnickoIme;
+        if(response.body.uloga !== "PRODAVAC"){
+          this.$router.push('/');
+        }
       
       })
 

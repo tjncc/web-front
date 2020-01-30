@@ -91,9 +91,8 @@ export default {
 .imgOglasa{
   width: auto;
   max-height: 165px;
-  max-width: 215px;
+  max-width: 210px;
   align-self: center;
-  margin: 4px;
   object-fit: contain;
 
 }

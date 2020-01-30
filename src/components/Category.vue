@@ -4,14 +4,11 @@
         <button v-if="this.$session.exists() && admin" title="Izmeni kategoriju"  v-on:click="izmeniKategoriju" class="btnBrisi"><img class="manageIcons" src="../assets/edit.svg"></button>
         <h1>{{kategorija.naziv}}</h1>
         <p class="opisKat">{{kategorija.opis}}</p>
-       <!-- <button v-if="this.$session.exists() && admin"  v-on:click="dodajOglase" class="btnDodajOglase">Dodaj oglase</button> -->
-
-        <div class="oglasiKategorije">
+              <div class="oglasiKategorije">
           
           <div class="omiljeniPrikaz" v-for="oglas in oglasi" v-bind:key="oglas.naziv" >
            
-         <!--    <button class="ukloniBtn">Ukloni oglas</button>-->
-            <div class="gore">
+                    <div class="gore">
               <h3 class="nazivOglasa"> {{ oglas.naziv }}</h3>
                <h4 v-if="!admin" class="cenaOglasa">{{ oglas.cena }}€</h4>
                 <button v-if="admin" title="Ukloni oglas" class="ukloniBtn"  v-on:click="ukloni(oglas.naziv)"><img class="ukloniSlika" src="../assets/quit.svg"></button>
@@ -34,7 +31,7 @@ export default {
               naziv: "",
               opis: ""
           },
-          oglasi: {},
+          oglasi: [],
 
         kupac: false,
         admin: false,
@@ -66,10 +63,6 @@ export default {
 
       izmeniKategoriju : function() {
           this.$router.push({name:'editCat', params:{id:this.kategorija.naziv}})
-      },
-
-      dodajOglase : function() {
-          this.$router.push('/add-category-articles')
       },
       
       otvori(naziv){
@@ -108,8 +101,11 @@ export default {
   
   created(){
     this.$http.get(`http://localhost:9090/WebProj/category/articles/${this.$route.params.id}`).then(response =>{
-      console.log(this.kategorija.naziv)
-      this.oglasi = response.body;
+      response.body.forEach(element => {
+         if(element.stanje === "AKTUELAN"){
+           this.oglasi.push(element);
+         }
+      });
     })
   }
 
@@ -199,6 +195,7 @@ h1{
 .slika{
   width: auto;
   max-height: 203px;
+  max-width: 240px;
   align-self: center;
   margin: auto;
   object-fit: contain;

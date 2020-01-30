@@ -87,8 +87,8 @@ export default {
             email: "",
             korisnickoIme: "",
             omiljeniOglasi: [],
-            poruceniProizvodi: {},
-            dostavljeniProizvodi: {}
+            poruceniProizvodi: [],
+            dostavljeniProizvodi: []
 
         },
 
@@ -132,7 +132,7 @@ export default {
         this.$http.post(`http://localhost:9090/WebProj/user/view-article/omiljeni`, this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           response.body.forEach(element => {
             if(element.stanje === "AKTUELAN"){
-              this.buyerInfo.omiljeniOglasi = response.body;
+              this.buyerInfo.omiljeniOglasi.push(element);
             }
           });
           
@@ -142,7 +142,7 @@ export default {
         this.$http.post(`http://localhost:9090/WebProj/user/view-article/poruceni`, this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           response.body.forEach(element => {
             if(element.stanje !== "OBRISAN"){
-              this.buyerInfo.poruceniProizvodi = response.body;
+              this.buyerInfo.poruceniProizvodi.push(element);
             }
           });
         })
@@ -150,7 +150,7 @@ export default {
          this.$http.post(`http://localhost:9090/WebProj/user/view-article/dostavljeni`, this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           response.body.forEach(element => {
             if(element.stanje !== "OBRISAN"){
-              this.buyerInfo.dostavljeniProizvodi = response.body;
+              this.buyerInfo.dostavljeniProizvodi.push(element);
             }
           });
 
@@ -278,6 +278,7 @@ label{
 .slika{
   width: auto;
   max-height: 203px;
+  max-width: 240px;
   align-self: center;
   margin: auto;
   object-fit: contain;

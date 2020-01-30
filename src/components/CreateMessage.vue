@@ -78,6 +78,8 @@ export default {
           this.poruka.posiljalac = response.body.korisnickoIme;
 
         })
+      } else {
+        this.$router.push('/');
       }
 
       this.$http.get('http://localhost:9090/WebProj/allusers', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {

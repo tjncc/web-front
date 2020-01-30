@@ -176,6 +176,7 @@ export default {
 .slika{
   width: auto;
   max-height: 203px;
+  max-width: 240px;
   align-self: center;
   margin: auto;
   object-fit: contain;
