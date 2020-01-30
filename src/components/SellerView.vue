@@ -14,7 +14,7 @@
         </div>
       </div>
       
-    <div v-if="this.$session.exists() && kupac && !prijavljenProdavac" class="dodajNovi">
+    <div v-if="this.$session.exists() && kupac && !prijavioVec" class="dodajNovi">
           <button class="dugmeDodaj" v-on:click="prijavi">Prijavi prodavca</button>          
       </div>
       <div class="ostaviRecDiv" v-if="kupioOdNjega">
@@ -31,8 +31,8 @@
 
 
 
-        <div class="recenzijaForm">
-            <form name="recenzijaF" v-if="kupioOdNjega" @submit.prevent="dodajNovuRecenziju">
+        <div v-if="kupioOdNjega" class="recenzijaForm">
+            <form name="recenzijaF"  @submit.prevent="dodajNovuRecenziju">
 
             <div class="recDrugiDeo">
             <input type="text" class="naslovRecProd" v-model="recenzija.naziv" placeholder="Naslov recenzije" />
@@ -146,6 +146,7 @@ export default {
         recenzije: {},
         recenzijeProd: {},
         prijavljenProdavac: false,
+        prijavioVec: false,
 
         ulogovan: {},
         kupac: false,
@@ -176,7 +177,9 @@ export default {
         prijavi() {
             if(this.prijavljenProdavac === false){
                 this.$http.post(`http://localhost:9090/WebProj/userreport/${this.$route.params.id}`,this.$session.get('idOne'), {headers:this.headers}).then((response) => {
+                    alert('Prodavac je prijavljen!');
                     this.prijavljenProdavac = true;
+                    this.$router.go();
                 }, (response) => {
             if(response.status == 400){
               alert('Već ste prijavili ovog prodavca!');
@@ -187,8 +190,8 @@ export default {
 
          lajkujProdavca() {
 
-                this.$http.post(`http://localhost:9090/WebProj/user/like/${this.$route.params.id}`,{headers:this.headers}).then((response) => {
-                    this.lajkovaoProdavca = true;
+                this.$http.post(`http://localhost:9090/WebProj/user/like/${this.$route.params.id}`, this.$session.get('idOne'),{headers:this.headers}).then((response) => {
+                    //this.lajkovaoProdavca = true;
                     this.$router.go();
             }) 
          
@@ -196,8 +199,8 @@ export default {
 
         dislajkujProdavca() {
 
-                this.$http.post(`http://localhost:9090/WebProj/user/dislike/${this.$route.params.id}`,{headers:this.headers}).then((response) => {
-                    console.log(this.$route.params.id)
+                this.$http.post(`http://localhost:9090/WebProj/user/dislike/${this.$route.params.id}`,this.$session.get('idOne'), {headers:this.headers}).then((response) => {
+                    //console.log(this.$route.params.id)
                     this.$router.go();
             })
         },
@@ -265,7 +268,19 @@ export default {
           this.sellerInfo = response.body;
           this.recenzija.oglas = "RECENZIJAPRODAVCA";
           this.recenzija.prodavac = response.body.korisnickoIme;
-            console.log(this.recenzija)
+          
+          response.body.prijavili.forEach(element => {
+               if(element === this.ulogovan.korisnickoIme){
+                   this.prijavioVec = true;
+               }
+          });
+
+          response.body.lajkovali.forEach(element => {
+              if(element === this.ulogovan.korisnickoIme){
+                  this.lajkovaoProdavca = true;
+              }
+          });
+           
 
         this.$http.get(`http://localhost:9090/WebProj/reviews-seller/${response.body.korisnickoIme}`).then((response) => {
                         this.recenzije = response.body;
@@ -288,7 +303,7 @@ export default {
         })
         }),
              
-
+/*
         this.$http.get('http://localhost:9090/WebProj/article-list-admin/poruceni' ,{headers:this.headers}).then((response) => {
             
              response.body.forEach(element => {
@@ -298,7 +313,7 @@ export default {
              });
              
         })
-
+*/
         this.$http.get('http://localhost:9090/WebProj/article-list-admin/dostavljeni' ,{headers:this.headers}).then((response) => {
             
              response.body.forEach(element => {

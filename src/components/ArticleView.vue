@@ -23,11 +23,11 @@
 
     <div class="desno">
       <div class="red">
-      <img v-if="!dostavljen" class="like" src="../assets/like.svg">
-      <img v-if="this.$session.exists() && dostavljen" v-on:click="likeOglas" class="likeDugme" src="../assets/like.svg">
+      <img v-if="!dostavljen || (dostavljen && lajkovaoVec)" class="like" src="../assets/like.svg">
+      <img v-if="this.$session.exists() && dostavljen && !lajkovaoVec" v-on:click="likeOglas" class="likeDugme" src="../assets/like.svg">
       <label class="broj">{{ oglas.brLajkova }}</label>
-      <img v-if="!dostavljen" class="like" src="../assets/dislike.svg">
-      <img v-if="this.$session.exists() && dostavljen" v-on:click="dislikeOglas" class="dislikeDugme" src="../assets/dislike.svg">
+      <img v-if="!dostavljen || (dostavljen && lajkovaoVec)" class="like" src="../assets/dislike.svg">
+      <img v-if="this.$session.exists() && dostavljen && !lajkovaoVec" v-on:click="dislikeOglas" class="dislikeDugme" src="../assets/dislike.svg">
       <label class="dolebroj">{{ oglas.brDislajkova }}</label>
 
 
@@ -52,7 +52,7 @@
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugmeObrisi" v-on:click="show" >Dodaj kategoriju</button>
         <button v-if="this.$session.exists() && kupac && !obrisan" class="dugme3" v-on:click="posaljiPoruku" >Pošalji poruku</button>
         <button v-if="this.$session.exists() && admin && !obrisan" class="dugme3" v-on:click="posaljiPoruku" >Pošalji poruku</button>
-         <button v-if="this.$session.exists() && kupac && !obrisan && !prijavljen" class="dugme3" v-on:click="prijaviOglas" >Prijavi oglas</button>
+         <button v-if="this.$session.exists() && kupac && !obrisan && !prijavioVec" class="dugme3" v-on:click="prijaviOglas" >Prijavi oglas</button>
 
     </div>
     </div>
@@ -184,6 +184,10 @@ export default {
       prodavac: false,
       autor: false,
 
+      ulogovan: "",
+      prijavioVec: false,
+      lajkovaoVec: false,
+
       kategorije: {},
       oglasModal: {},
       recenzije: {},
@@ -238,13 +242,13 @@ export default {
 
       delivered : function(){
       this.$http.post(`http://localhost:9090/WebProj/user/delivered/${this.$route.params.id}`, this.$session.get('idOne'), {headers:this.headers}).then(() =>{
-      this.dostavljen = true; 
+      this.dostavljen = true;
       this.$emit('changedView'); 
     })
     
     },
       likeOglas : function(){
-      this.$http.post(`http://localhost:9090/WebProj/article/like/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+      this.$http.post(`http://localhost:9090/WebProj/article/like/${this.$route.params.id}`,this.$session.get('idOne'),{headers:this.headers}).then(() =>{
       this.$emit('changedView');
       
     
@@ -253,7 +257,7 @@ export default {
       },
 
       dislikeOglas : function(){
-      this.$http.post(`http://localhost:9090/WebProj/article/dislike/${this.$route.params.id}`,{headers:this.headers}).then(() =>{
+      this.$http.post(`http://localhost:9090/WebProj/article/dislike/${this.$route.params.id}`,this.$session.get('idOne'),{headers:this.headers}).then(() =>{
       this.$emit('changedView');
     
     })
@@ -380,7 +384,7 @@ export default {
       prijaviOglas : function() {
          this.$http.post(`http://localhost:9090/WebProj/report/article/${this.$route.params.id}`,this.$session.get('idOne') ,{headers:this.headers}).then(() => {
            alert('Oglas je prijavljen!');
-           this.prijavljen = true;
+           this.$router.go();
          }, (response) => {
             if(response.status == 400){
               alert('Već ste prijavili ovaj oglas!');
@@ -397,7 +401,7 @@ export default {
 
   beforeCreate(){
 
-    this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
+        this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
         this.oglas = response.body;
         this.recenzija.oglas = response.body.naziv;
 
@@ -407,8 +411,27 @@ export default {
           this.narucen = false;
           this.dostavljen = false;
         }
+
+        response.body.lajkovali.forEach(element => {
+          if(element === this.ulogovan){
+            this.lajkovaoVec = true;
+          }
+        });
+
+        response.body.prijavili.forEach(element => {
+          if(element === this.ulogovan){
+            this.prijavioVec = true;
+          }
+        });
+
+    })
+
+
+
+
         if (this.$session.exists()) {
       this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
+        this.ulogovan = response.body.korisnickoIme;
 
         response.body.omiljeniOglasi.forEach(element => {
           if(element === this.$route.params.id){
@@ -436,8 +459,12 @@ export default {
 
           if(response.body.uloga === "KUPAC"){
             this.kupac = true;
+            console.log('usao');
+            console.log
             if(this.oglas.stanje === "DOSTAVLJEN"){
               this.kupio = true;
+              console.log('ovo gledaj')
+              console.log(this.kupio)
             }
           } else if (response.body.uloga === "ADMINISTRATOR"){
             this.admin = true;
@@ -451,10 +478,8 @@ export default {
 
 
         })
+        }
 
-
-    }
-    })
 
   },
 
