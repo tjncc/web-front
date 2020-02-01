@@ -14,7 +14,7 @@
         </div>
       </div>
       
-    <div class="dodajNovi">
+    <div v-if="!sellerInfo.sumnjivProdavac" class="dodajNovi">
           <label class="tekstNovi">Dodaj novi oglas</label>
           <button class="dugmeDodaj" v-on:click="dodajOglas"><img class="dodajSlika" src="../assets/add.svg"></button>
       </div>
@@ -80,7 +80,8 @@ export default {
             korisnickoIme: "",
             uloga: "",
             brLajkova: 0,
-            brDislajkova: 0
+            brDislajkova: 0,
+            sumnjivProdavac: false,
         },
         izabranoStanje: "Aktivan",
         aktivniOglasi: [],
@@ -119,13 +120,16 @@ export default {
     },
 
     beforeCreate(){
+        if(!this.$session.exists()){
         this.$router.push('/');
+        }
     },
 
     created(){
         this.$http.post('http://localhost:9090/WebProj/userinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
           this.sellerInfo.korisnickoIme = response.body.korisnickoIme;
           this.sellerInfo.uloga = response.body.uloga;
+          this.sellerInfo.sumnjivProdavac = response.body.sumnjivProdavac;
           
             this.$http.get(`http://localhost:9090/WebProj/reviews-seller/${response.body.korisnickoIme}`).then((response) => {
                 this.recenzije = response.body;

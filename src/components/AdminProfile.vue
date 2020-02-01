@@ -12,6 +12,7 @@
         <h2 class="nazivKorisnika" v-on:click="prodavacPregled(user.korisnickoIme)"> {{ user.korisnickoIme }}</h2>
         <h4 class="uloga" >{{ user.uloga }}</h4>
         <button class="promeniUlogu" v-on:click="promeniUlogu(user.korisnickoIme)">Promeni ulogu</button>
+        <button class="promeniUlogu" v-if="user.sumnjivProdavac" v-on:click="skiniZabranu(user.korisnickoIme)">Skini zabranu</button>
 
     </div>
     </div>
@@ -56,6 +57,14 @@ export default {
            }
       })
       },
+
+      skiniZabranu(korisnickoIme){
+          this.$http.post(`http://localhost:9090/WebProj/admin/freeuser/${korisnickoIme}`, {headers:this.headers}).then((response) => {
+            this.$router.go();
+      })
+     
+      },
+
     
     
   },
@@ -64,6 +73,7 @@ export default {
         this.$http.post('http://localhost:9090/WebProj/usersinfo', this.$session.get('idOne') ,{headers:this.headers}).then((response) => {
             response.body.forEach(element => {
                 if(element.uloga !== "ADMINISTRATOR"){
+                  console.log(element.sumnjivProdavac);
                   this.users.push(element);
                 }
             });
@@ -102,7 +112,7 @@ export default {
 <style scoped>
 
 h1{
-    margin-top: 80px;
+    margin-top: 120px;
         color: #4b464b;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
 }

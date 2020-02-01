@@ -438,10 +438,7 @@ export default {
             this.admin = true;
           } else if (response.body.uloga === "PRODAVAC"){
             this.prodavac = true;
-            if((response.body.korisnickoIme === this.oglas.prodavac) && (this.oglas.stanje === "AKTUELAN")){
-              this.autor = true;
-              
-          }
+
           }
 
 
@@ -452,6 +449,10 @@ export default {
         this.$http.get(`http://localhost:9090/WebProj/articleinfo/${this.$route.params.id}`).then(response =>{
         this.oglas = response.body;
         this.recenzija.oglas = response.body.naziv;
+
+        if((this.ulogovan === response.body.prodavac) && (response.body.stanje === "AKTUELAN")){
+          this.autor = true;
+        }
 
         if(this.oglas.stanje === "OBRISAN"){
           this.obrisan = true;

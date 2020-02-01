@@ -121,6 +121,9 @@ export default {
         if(response.body.uloga !== "PRODAVAC"){
           this.$router.push('/');
         }
+        if(response.body.sumnjivProdavac){
+          this.$router.push('/');
+        }
       
       })
 

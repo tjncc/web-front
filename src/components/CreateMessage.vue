@@ -5,7 +5,7 @@
         <p class="primalac">Primalac: </p>
         <p v-if="odgovor" class="primalacOdg">{{ this.poruka.primalac }}</p>
 
-        <select v-model="poruka.primalac" v-if="this.$session.exists() && kupac" class="selectItem" required>
+        <select v-model="poruka.primalac" v-if="this.$session.exists() && kupac && !odgovor" class="selectItem" required>
           <option v-for="prodavac in prodavci" v-bind:key="prodavac.korisnickoIme">{{ prodavac.korisnickoIme }}</option>
         </select>
 

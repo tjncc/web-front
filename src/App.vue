@@ -2,7 +2,7 @@
   <div>
     <nav-bar :key="navBarKey" @logOut="forceRerender"></nav-bar>
     <router-view name="side"></router-view>
-    <router-view name="header"></router-view>
+   <!-- <router-view name="header"></router-view> -->
     <router-view :key="updateKey" @changedView="forceRenderChange" @loggedIn="forceRerender"></router-view>
     
 

@@ -19,7 +19,7 @@
             <label>{{ buyerInfo.telefon }}</label>
         </div>
         <div class="red">
-           <img class="icon" src="../assets/mail.svg">
+           <img class="icon" src="../assets/email.svg">
            <label>{{ buyerInfo.email }}</label>
         </div>       
       </div>    

@@ -1,8 +1,8 @@
 <template>
   <div class="search">
       
-      <input type="text" placeholder="Pretraži..." class="pretraga">
-      <button><img src="../assets/search.svg"></button>
+      <input type="text" className="searchInput" placeholder="Pretraži..." class="pretraga">
+      <button className="searchBtn"><img className="searchImg" src="../assets/search.svg"></button>
       
 
   </div>
@@ -23,12 +23,9 @@ export default {
 
 <style scoped>
 
-div {
-  display: flex;
-  justify-content: center;
-}
 
-input[type=text] {
+
+.searchInput {
   
   padding: 6px;
   margin-top: 54px;
@@ -47,9 +44,11 @@ input[type=text] {
 
 .search {
   margin: 12px;
+  display: flex;
+  justify-content: center;
 }
 
-button {
+.searchBtn {
     
     margin-top: 54px;
     width: 46px;
@@ -64,7 +63,7 @@ button {
     
 }
 
-img{
+.searchImg{
   height: 90%;
   width: auto;
 }

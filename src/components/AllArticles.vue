@@ -1,9 +1,28 @@
 <template>
   <div class="mainPage">
-      <router-view name="header"></router-view>
+  <div class="searchDiv">
+    <input type="text" v-model="searchName" class="searchInput" placeholder="Pretraži..." />
+  </div>
+  <div class="sliderDiv">
+    <label class="labelSlider">Min cena: </label>
+    <input type="range" min="1" max="1000" value="0" v-model="minPrice" class="slider" id="myRange">
+    <label class="labelSlider">{{minPrice}}</label>
+  
+  <div>
+    <label class="labelSlider">Max cena: </label>
+    <input type="range" min="1" max="1000" value="1000" v-model="maxPrice" class="slider" id="myRange">
+    <label class="labelSlider">{{maxPrice}}</label>
+  </div>
+  </div>
+    <label class="labelCity">Grad: </label>
+    <select class="selectCity" v-model="selectedCity">
+      <option></option>
+      <option v-for="grad in gradovi" v-bind:key="grad">{{ grad }}</option>
+    </select>
+
     <h2 class="oglasi">Aktuelni oglasi:</h2>
     <div class="svioglasi">
-    <div class="oglas" v-for="oglas in oglasi" v-bind:key="oglas.naziv" >
+    <div class="oglas"  v-for="oglas in filteredArticles" v-bind:key="oglas.naziv" >
      
       <div class="gore" v-on:click="otvori(oglas.naziv)">
         <h3 class="nazivOglasa"> {{ oglas.naziv }}</h3>
@@ -27,8 +46,12 @@ export default {
   data () {
     return {
 
-      oglasi: {},
-
+      oglasi: [],
+      searchName: '',
+      minPrice: 0,
+      maxPrice: 1000,
+      gradovi: {},
+      selectedCity: "",
        headers : {
         'Content-Type' : 'application/json'
       }
@@ -49,7 +72,23 @@ export default {
         this.oglasi = response.body;
         
     })
+
+        this.$http.get('http://localhost:9090/WebProj/articles/cities',{headers:this.headers}).then(response =>{
+        this.gradovi = response.body;
+        
+    })
+  },
+
+  computed : {
+    filteredArticles(){
+      return this.oglasi.filter((oglas) => {
+        return (oglas.naziv.toLowerCase().match(this.searchName.toLowerCase()) || 
+        oglas.prodavac.toLowerCase().match(this.searchName.toLowerCase())) && 
+        (oglas.cena >= this.minPrice) && (oglas.cena <= this.maxPrice) && oglas.grad.toLowerCase().match(this.selectedCity.toLowerCase()); 
+      })
+    }
   }
+
 }
 </script>
 
@@ -61,7 +100,7 @@ export default {
 
 .oglasi{
   text-align: center;
-  margin: 28px 0 14px 10px;
+  margin: 5px 0 14px 10px;
   padding: 8px;
   color: #7e747e;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -83,7 +122,6 @@ export default {
   margin: 20px 0px 20px 20px;
   border: 3px solid #d0cad6;
   cursor: pointer;
-  
 }
 
 
@@ -94,6 +132,7 @@ export default {
   max-width: 210px;
   align-self: center;
   object-fit: contain;
+  padding: 3px;
 
 }
 
@@ -138,6 +177,86 @@ export default {
 }
 
 
+.searchDiv{
+  margin: 110px 0 10px 0;
+  padding: 10px;
+  display: flex;
+}
+
+.searchInput{
+  margin-top:20px;
+  width:450px;
+  height: 28px;
+  padding: 5px;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  align-self: center;
+  justify-content: center;
+  outline: none;
+  border: 1px solid black;
+  margin-left: 22%;
+  background-image: url('../assets/search.svg');
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position: 5px;
+    text-indent: 30px;
+}
+
+
+.slider {
+  -webkit-appearance: none;
+  width: 30%;
+  height: 6px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+
+
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 15px;
+  border-radius: 50%; 
+  background: rgb(82, 76, 117);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 13px;
+  border-radius: 50%;
+  background:  rgb(82, 76, 117);
+  cursor: pointer;
+}
+
+.labelSlider{
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+}
+
+.sliderDiv{
+    margin-left: 24%;
+}
+
+.selectCity{
+  height: 30px;
+  outline: none;
+  margin-left: 5px;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  margin-top: 20px;
+
+}
+
+.labelCity{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  margin-top: 30px;
+  margin-left: 31%;
+}
 
 
 </style>

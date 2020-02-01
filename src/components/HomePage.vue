@@ -60,13 +60,14 @@ export default {
 
 .oglasi{
   text-align: center;
-  margin: 20px 0 11px 10px;
+  margin: 120px 0 11px 10px;
   padding: 8px;
   color: #7e747e;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     display: flex;
     flex-direction: row;
 }
+
 
 .svioglasi{
   display: flex;

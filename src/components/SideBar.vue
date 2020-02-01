@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="btndiv" v-if="this.$session.exists() && admin">
+        <div class="btndiv" >
         <button class="katbtn" v-if="this.$session.exists() && admin" v-on:click="dodajKateg">Dodaj kategoriju</button>
         </div>
         <div class="sidebar">
